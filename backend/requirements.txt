@@ -1,0 +1,7 @@
+python-dotenvrequests>=2.31.0
+pytz>=2023.3
+openrouter
+objprint
+fastapi[standard]
+fish-audio-sdk
+rich
