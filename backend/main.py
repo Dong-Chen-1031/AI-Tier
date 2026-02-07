@@ -40,6 +40,13 @@ class TierRequest(BaseModel):
     llm_model: str = "arcee-ai/trinity-large-preview:free"
     style: Optional[str] = None
 
+    def __repr__(self):
+        nt = "\n\t"
+        return f"TierRequest({nt}subject={self.subject}, {nt}role_name={self.role_name}, {nt}role_description={self.role_description}, {nt}tier={self.tier}, {nt}suggestion={self.suggestion}, {nt}tts={self.tts}, {nt}tts_model={self.tts_model}, {nt}tts_speed={self.tts_speed}, {nt}llm_model={self.llm_model}, {nt}style={self.style}\n)"
+
+    def __str__(self):
+        return self.__repr__()
+
     def to_prompt(self) -> str:
         tt = "銳評"
 
@@ -80,7 +87,7 @@ class UUIDResponse(BaseModel):
 async def tts(case_id: str) -> StreamingResponse:
     """處理 TTS 請求，根據 case_id 返回對應的音頻流"""
     return StreamingResponse(
-        ApiService.get_api(case_id).tts_gen(), media_type="audio/mp3"
+        ApiService.get_api_service(case_id).tts_gen(), media_type="audio/mp3"
     )
 
 
@@ -88,7 +95,7 @@ async def tts(case_id: str) -> StreamingResponse:
 async def text(case_id: str) -> StreamingResponse:
     """處理文本流請求，根據 case_id 返回對應的文本流"""
     return StreamingResponse(
-        ApiService.get_api(case_id).llm_gen(), media_type="text/event-stream"
+        ApiService.get_api_service(case_id).llm_gen(), media_type="text/event-stream"
     )
 
 
@@ -104,6 +111,8 @@ async def chat(chat_input: TierRequest) -> UUIDResponse:
         tts_speed=chat_input.tts_speed,
     ).start()
 
-    print(f"Received message: {chat_input}")
+    # print(f"Received message: {chat_input}")
+
+    logger.info(f"Received request: {chat_input}")
 
     return UUIDResponse(case_id=uuid)

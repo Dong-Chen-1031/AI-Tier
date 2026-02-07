@@ -1,9 +1,9 @@
-import os
 from typing import Any, AsyncGenerator
 
 from dotenv import load_dotenv
 from openrouter import OpenRouter
 from pydantic import BaseModel
+from settings import AI_API_KEY
 
 load_dotenv()
 
@@ -16,7 +16,7 @@ class ChatRespond(BaseModel):
 async def stream_messages(
     messages: str, model: str = "arcee-ai/trinity-large-preview:free"
 ) -> AsyncGenerator[str, Any]:
-    async with OpenRouter(api_key=os.getenv("AI_API_KEY")) as client:
+    async with OpenRouter(api_key=AI_API_KEY) as client:
         response = await client.chat.send_async(
             model=model,
             messages=[

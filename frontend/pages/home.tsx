@@ -57,7 +57,7 @@ const Home: React.FC = () => {
       if (done) break;
 
       const chunk = decoder.decode(value, { stream: true });
-      console.log("收到片段:", chunk);
+      // console.log("收到片段:", chunk);
       setMessage((prev) => prev + chunk);
     }
   };

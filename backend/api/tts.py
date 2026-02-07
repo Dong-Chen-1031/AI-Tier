@@ -1,9 +1,9 @@
-import os
 from typing import Any, AsyncGenerator, Optional
 
 from dotenv import load_dotenv
 from fishaudio import AsyncFishAudio
 from rich.traceback import install
+from settings import FISH_API_KEY
 
 install()
 
@@ -15,7 +15,7 @@ def websocket_tts(
     model: Optional[str] = None,
     speed: Optional[float] = None,
 ) -> AsyncGenerator[bytes, Any]:
-    client = AsyncFishAudio(api_key=os.getenv("FISH_API_KEY"))
+    client = AsyncFishAudio(api_key=FISH_API_KEY)
 
     # Stream audio via WebSocket
     audio_stream = client.tts.stream_websocket(
