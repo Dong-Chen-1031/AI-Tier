@@ -1,6 +1,6 @@
 import asyncio
 from collections import OrderedDict
-from typing import Any, AsyncGenerator, NoReturn, Optional
+from typing import Any, AsyncGenerator, Optional
 from uuid import uuid4
 
 from api import ai, tts
@@ -29,6 +29,7 @@ class Broadcaster:
 
 class ApiService:
     all_services: OrderedDict[str, "ApiService"] = OrderedDict()
+    auto_cleanup_task_started = False
 
     def __init__(
         self,
@@ -57,9 +58,12 @@ class ApiService:
             self.tts_queue_audio = self.tts_broadcaster.subscribe()
             self.tts_queue_save = self.tts_broadcaster.subscribe()
 
-        # for cleanup
+        # for get api service by case_id and auto cleanup
         self.created_at = asyncio.get_event_loop().time()
         self.__class__.all_services[self.case_id] = self
+        if not self.__class__.auto_cleanup_task_started:
+            self.__class__.auto_cleanup_task_started = True
+            asyncio.create_task(self.__class__.cleanup_api_service())
 
     @classmethod
     def get_api_service(cls, case_id: str) -> "ApiService" | None:
@@ -114,9 +118,3 @@ class ApiService:
 
     def llm_gen(self) -> AsyncGenerator[str, None]:
         return self.queue_to_async_gen(self.queue_for_text)
-
-
-async def auto_cleanup(interval) -> NoReturn:
-    while True:
-        ApiService.cleanup_api_service()
-        await asyncio.sleep(API_SERVICE_TIME_OUT)
