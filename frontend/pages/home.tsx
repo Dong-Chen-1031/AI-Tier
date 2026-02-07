@@ -25,6 +25,7 @@ const Home: React.FC = () => {
       subject: "蔣中正",
       role_name: "孫中山",
       tts_model: "339a6814818044f7b00161c8e0dd6e35",
+      tts_speed: 1.3,
     };
     axios
       .post(`${config.api_endpoints}/tier`, requestData)

@@ -10,8 +10,10 @@ install()
 load_dotenv()
 
 
-async def tts(
-    text_gen: AsyncGenerator[str, Any], model: Optional[str] = None
+def websocket_tts(
+    text_gen: AsyncGenerator[str, Any],
+    model: Optional[str] = None,
+    speed: Optional[float] = None,
 ) -> AsyncGenerator[bytes, Any]:
     client = AsyncFishAudio(api_key=os.getenv("FISH_API_KEY"))
 
@@ -20,11 +22,8 @@ async def tts(
         text_gen,
         reference_id=model,
         format="mp3",
-        latency="balanced",  # Use "balanced" for real-time, "normal" for quality
+        latency="balanced",
+        speed=speed,
     )
 
-    async for chunk in audio_stream:
-        print(f"Received audio chunk of size: {len(chunk)} bytes")
-        yield chunk
-        # await asyncio.sleep(4)  # Simulate processing delay
-    await audio_stream.aclose()
+    return audio_stream

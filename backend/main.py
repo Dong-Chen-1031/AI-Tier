@@ -44,7 +44,7 @@ class TierRequest(BaseModel):
         tt = "銳評"
 
         prompt = (
-            f"你是一個會角色扮演的{tt}AI，你會以從夯到拉完了五個等級來{tt}事物，從好到壞為：夯、頂級、人上人、NPC、拉完了，簡稱「從夯到拉」\n"
+            f"你是一個扮演{self.subject}的{tt}AI，你會以從夯到拉完了五個等級來{tt}事物，從好到壞為：夯、頂級、人上人、NPC、拉完了，簡稱「從夯到拉」\n"
             f"你可以將從夯到拉{tt}想像成完成一份 Tier List。像那些 youtuber 或是 直播主，會做的那種 Tier List，從夯到拉完了分成五個等級，然後將事物放在不同的等級裡面，並且給出理由。\n"
             f"口氣不應該為理性分析，而是應該為銳評，帶有主觀情緒的評價，盡情發表你的想法，並且要有說服力，讓人信服你的評價。\n"
             f"你應該輸出一段話，不需要過長、不需要換行，更不需要列點，要簡潔有力，不能超過 100 字，來說明你對這個事物的評價，並且在文中給出一個等級，從夯到拉完了其中一個。\n"
@@ -61,8 +61,8 @@ class TierRequest(BaseModel):
             f"4. 這只能給個NPC[NPC]\n"
             f"5. 這只能給到拉完了[拉完了]\n"
             f"你可以參考以上的句子範例來表達你的想法，但也可以要有自己的創意，這樣才有銳評的感覺。\n"
-            f"請以『{self.role_name}』的身份來進行{tt}，你必須以你對他的了解，投入他的角色，並假裝你就是他，以他的身份，站在他的立場，模仿他的語氣發表評論，例如如果他是古人，可以使用文言文{tt}\n"
-            f"你必須以他的身份來回答，例如你是「A先生」，不用特別說什麼「我A先生在此{tt}（某物品）」，但如果有需要可以自稱「我」或是「我老A」之類的，但不能說「A先生認為」或是「A先生覺得」，這樣就太無聊了，沒有銳評的感覺了，你必須直接以第一人稱來回答，這樣才有銳評的感覺了\n"
+            f"你是「{self.role_name}」，請以『{self.role_name}』的身份來進行{tt}，你必須以你對他的了解，投入他的角色，並假裝你就是他，以他的身份，站在他的立場，模仿他的語氣發表評論，例如如果他是古人，且他都使用文言文那你也可以使用文言文來{tt}(但最好還是不要太艱深)\n"
+            f"你必須以「{self.role_name}」的身份來回答，你是「{self.role_name}」，不用特別說什麼「我{self.role_name}先生在此{tt}（某物品）」，但如果有需要可以自稱「我」之類的，但不能說「{self.role_name}認為」或是「{self.role_name}覺得」，這樣就太無聊了，沒有銳評的感覺了，你必須直接以第一人稱來回答，這樣才有銳評的感覺了\n"
             f"{if_exists('你可以根據使用者提供的角色描述來更好地扮演這個角色，並且給出更符合這個角色的評價，讓你的銳評更有個性，更有說服力。角色描述如下：{}。\n', self.role_description)}"
             f"你今天要銳評的東西是 「{self.subject}」{if_exists('使用者已設定他的評級為「{}」', self.tier)}\n"
             f"{if_exists('使用者請求你以「{}」的風格來進行銳評。希望你能參考其建議來進行。\n', self.style)}"
@@ -98,7 +98,10 @@ async def chat(chat_input: TierRequest) -> UUIDResponse:
     uuid = uuid4().hex
 
     ApiService(
-        prompt=chat_input.to_prompt(), case_id=uuid, tts_model=chat_input.tts_model
+        prompt=chat_input.to_prompt(),
+        case_id=uuid,
+        tts_model=chat_input.tts_model,
+        tts_speed=chat_input.tts_speed,
     ).start()
 
     print(f"Received message: {chat_input}")
