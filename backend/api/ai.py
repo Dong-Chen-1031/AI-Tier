@@ -1,4 +1,4 @@
-from typing import Any, AsyncGenerator
+from typing import Any, AsyncGenerator, Optional
 
 from dotenv import load_dotenv
 from openrouter import OpenRouter
@@ -14,8 +14,10 @@ class ChatRespond(BaseModel):
 
 
 async def stream_messages(
-    messages: str, model: str = "arcee-ai/trinity-large-preview:free"
+    messages: str, model: Optional[str] = None
 ) -> AsyncGenerator[str, Any]:
+    if not model:
+        model = "arcee-ai/trinity-large-preview:free"
     async with OpenRouter(api_key=AI_API_KEY) as client:
         response = await client.chat.send_async(
             model=model,

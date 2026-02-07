@@ -1,10 +1,11 @@
 import asyncio
 from collections import OrderedDict
 from re import sub
-from typing import Any, AsyncGenerator, Optional
+from typing import Any, AsyncGenerator, Optional, TypeVar
 from uuid import uuid4
 
 from api import ai, tts
+from fastapi import HTTPException
 from settings import API_SERVICE_TIME_OUT
 from utils.log import logger
 
@@ -69,11 +70,12 @@ class ApiService:
             asyncio.create_task(self.__class__.cleanup_api_service())
 
     @classmethod
-    def get_api_service(cls, case_id: str) -> "ApiService" | None:
+    def get_api_service(cls, case_id: str) -> "ApiService":
         if case_id in cls.all_services:
             return cls.all_services[case_id]
 
         logger.error(f"ApiService with case_id {case_id} not found")
+        raise HTTPException(status_code=404, detail="Case not found")
 
     @classmethod
     async def cleanup_api_service(cls):
@@ -86,8 +88,10 @@ class ApiService:
                 else:
                     break
 
+    T = TypeVar("T")
+
     @staticmethod
-    async def queue_to_async_gen(queue: asyncio.Queue) -> AsyncGenerator[str, None]:
+    async def queue_to_async_gen(queue: asyncio.Queue[T]) -> AsyncGenerator[T, None]:
         while True:
             chunk = await queue.get()
             if chunk is None:
@@ -135,7 +139,9 @@ class ApiService:
 
     def tts_gen(self) -> AsyncGenerator[bytes, None]:
         if not self.tts:
-            return None
+            raise HTTPException(
+                status_code=400, detail="TTS is disabled for this service"
+            )
         return self.queue_to_async_gen(self.tts_queue_audio)
 
     def llm_gen(self) -> AsyncGenerator[str, None]:

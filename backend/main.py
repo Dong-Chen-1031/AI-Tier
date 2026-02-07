@@ -1,3 +1,4 @@
+from tkinter import N
 from typing import Literal, Optional
 from uuid import uuid4
 
@@ -31,8 +32,8 @@ def if_exists(string: str, *args, **kwargs) -> str:
 class TierRequest(BaseModel):
     subject: str
     role_name: str = "銳評AI"
-    role_description: Optional[str] = False
-    tier: Tiers = None
+    role_description: Optional[str] = N
+    tier: Optional[Tiers] = None
     suggestion: Optional[str] = None
     tts: Optional[bool] = None
     tts_model: Optional[str] = None
