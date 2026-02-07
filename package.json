@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite ./frontend",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview",
+    "dev": "cd frontend && vite",
+    "build": "cd frontend && tsc -b && vite build",
+    "lint": "cd frontend && eslint .",
+    "preview": "cd frontend && vite preview",
     "backend": "cd ./backend && fastapi dev"
   },
   "dependencies": {
@@ -15,6 +15,7 @@
     "axios": "^1.13.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "framer-motion": "^12.33.0",
     "lucide-react": "^0.563.0",
     "radix-ui": "^1.4.3",
     "react": "^19.2.0",
