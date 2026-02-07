@@ -8,13 +8,13 @@
 
 1. **TierBoard 組件** - Tier List 主視覺化面板
    - 在 [frontend/components/](frontend/components/) 創建 `TierBoard.tsx`
-   - 渲染五個等級區域（夯/頂級/人上人/NPC/拉完了）使用 [從夯到拉.png](frontend/assets/從夯到拉.png) 作為背景或參考
+   - 渲染五個等級區域（夯/頂級/人上人/NPC/拉完了）使用 [從夯到拉.png](frontend/assets/從夯到拉.png) 作參考，另外以 html/css 實現
    - 每個等級區域支持放置「對象卡片」
    - 使用 Flexbox/Grid 佈局，響應式設計
 
 2. **SubjectCard 組件** - 銳評對象的可視化卡片
    - 在 [frontend/components/](frontend/components/) 創建 `SubjectCard.tsx`
-   - 顯示 `subject` 名稱和可選圖標
+   - 顯示 `subject` 名稱和一個測試用的圖片（可以使用 [loader.svg](frontend/assets/loader.svg)）
    - 支持位置動畫（從待評區移動到目標等級）
    - 使用 Framer Motion 實現平滑移動
 

@@ -69,7 +69,7 @@ const Home: React.FC = () => {
     }
   };
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div>
       <audio ref={audioRef}></audio>
       <p>{message}</p>
       <button onClickCapture={callApi}>test</button>
