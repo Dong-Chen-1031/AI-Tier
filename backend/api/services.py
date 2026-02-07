@@ -1,11 +1,14 @@
 import asyncio
 from collections import OrderedDict
+from re import sub
 from typing import Any, AsyncGenerator, Optional
 from uuid import uuid4
 
 from api import ai, tts
 from settings import API_SERVICE_TIME_OUT
 from utils.log import logger
+
+NO_VOICE = r"\[夯\]|\[頂級\]|\[人上人\]|\[NPC\]|\[拉完了\]"
 
 
 class Broadcaster:
@@ -19,7 +22,7 @@ class Broadcaster:
 
     async def publish(self, async_gen: AsyncGenerator[Any, None]):
         async for chunk in async_gen:
-            # print(f"Publishing chunk: {chunk}")
+            # print(f"Publishing chunk: {len(chunk)}")
             for queue in list(self.subscribers):
                 queue.put_nowait(chunk)
 
@@ -73,13 +76,15 @@ class ApiService:
         logger.error(f"ApiService with case_id {case_id} not found")
 
     @classmethod
-    def cleanup_api_service(cls, case_id: str):
-        time_before = asyncio.get_event_loop().time() - API_SERVICE_TIME_OUT
-        for case_id in cls.all_services:
-            if cls.all_services[case_id].created_at < time_before:
-                cls.all_services.pop(case_id)
-            else:
-                break
+    async def cleanup_api_service(cls):
+        while True:
+            await asyncio.sleep(API_SERVICE_TIME_OUT)
+            time_before = asyncio.get_event_loop().time() - API_SERVICE_TIME_OUT
+            for case_id, service in list(cls.all_services.items()):
+                if service.created_at < time_before:
+                    cls.all_services.pop(case_id)
+                else:
+                    break
 
     @staticmethod
     async def queue_to_async_gen(queue: asyncio.Queue) -> AsyncGenerator[str, None]:
@@ -87,14 +92,31 @@ class ApiService:
             chunk = await queue.get()
             if chunk is None:
                 break
+            if not chunk:
+                continue
             yield chunk
 
     async def _gen_for_tts(self) -> AsyncGenerator[str, None]:
+        temp = ""
         while True:
-            chunk = await self.queue_for_tts.get()
+            chunk: str = await self.queue_for_tts.get()
+
             if chunk is None:
+                if temp:
+                    # logger.info(f"供 TTS 使用的片段: {temp}")
+                    yield temp
                 break
-            yield chunk
+
+            chunk = sub(NO_VOICE, "", chunk)
+            if not chunk.strip():
+                continue
+
+            temp += chunk
+            if len(temp) < 5:
+                continue
+            # logger.info(f"供 TTS 使用的片段: {temp}")
+            yield temp
+            temp = ""
 
     def start(self):
         asyncio.create_task(

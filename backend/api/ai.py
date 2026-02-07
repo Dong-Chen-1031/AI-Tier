@@ -29,12 +29,19 @@ async def stream_messages(
         )
 
         full_content = ""
+        temp = ""
         async for chunk in response:
             if chunk.choices:
                 delta = chunk.choices[0].delta
-                if delta.content:
-                    content = delta.content
-                    full_content += content
-                    yield content
+                text = delta.content or ""
+                full_content += text
+                if text:
+                    if ("[" in text and "]" not in text) or (temp and "]" not in text):
+                        temp += text
+                        continue
+                    elif "]" in text and "[" not in text:
+                        text = temp + text
+                        temp = ""
+                    yield text
                 if chunk.choices[0].finish_reason:
                     return
