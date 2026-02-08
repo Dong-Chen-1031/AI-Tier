@@ -5,7 +5,9 @@ import { useReviewCases } from "../contexts/ReviewCaseContext";
 import axios from "axios";
 import config from "../config/constants";
 
-export const ShareButton: React.FC = () => {
+export const ShareButton: React.FC<{ className?: string }> = ({
+  className,
+}) => {
   const { cases } = useReviewCases();
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -40,12 +42,14 @@ export const ShareButton: React.FC = () => {
     }
   };
 
+  const disabled = loading || cases.length === 0;
+
   return (
     <Button
       onClick={handleShare}
-      disabled={loading || cases.length === 0}
+      disabled={disabled}
       variant="outline"
-      className="gap-2"
+      className={`gap-2 ${className} ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
     >
       {copied ? (
         <>

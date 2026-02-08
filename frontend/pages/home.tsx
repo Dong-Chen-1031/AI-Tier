@@ -67,9 +67,6 @@ const Home: React.FC = () => {
             <InputGroupIcon onDecided={handleTierDecided} />
           </div>
         </div>
-        <div className="flex justify-end mt-4">
-          <ShareButton />
-        </div>
       </div>
 
       {/* Case Detail Modal */}

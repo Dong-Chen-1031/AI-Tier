@@ -44,6 +44,7 @@ import { ModelSelector } from "./model-selector";
 import React from "react";
 import axios from "axios";
 import { useReviewCases } from "../contexts/ReviewCaseContext";
+import { ShareButton } from "./ShareButton";
 
 export interface TierRequest {
   subject: string; //V
@@ -122,9 +123,12 @@ export const InputGroupIcon = ({
 
       const chunk = decoder.decode(value, { stream: true });
       fullText += chunk;
-      const cleanText = fullText.replace(/\[(夯|頂級|人上人|NPC|拉完了)\]/g, "");
+      const cleanText = fullText.replace(
+        /\[(夯|頂級|人上人|NPC|拉完了)\]/g,
+        "",
+      );
       setMessage(cleanText);
-      
+
       // Update streaming text in global state
       updateCase(case_id, { streamingText: fullText, reply: cleanText });
 
@@ -148,7 +152,7 @@ export const InputGroupIcon = ({
 
     // Set ImgUrl state for local display until it moves
     setImgUrl(img_url);
-    
+
     // Add case to global state
     addCase({
       caseId: case_id,
@@ -460,16 +464,18 @@ export const InputGroupIcon = ({
                   )}
                 />
               </Field>
-
-              <Button
-                className="cursor-pointer"
-                variant="outline"
-                type="submit"
-                disabled={progress === "loading"}
-              >
-                {progress === "setting" ? <SpeechIcon /> : <Loader />}
-                開始銳評
-              </Button>
+              <div className="w-full grid grid-cols-3 gap-4 mt-6">
+                <Button
+                  className="cursor-pointer col-span-2"
+                  variant="outline"
+                  type="submit"
+                  disabled={progress === "loading"}
+                >
+                  {progress === "setting" ? <SpeechIcon /> : <Loader />}
+                  開始銳評
+                </Button>
+                <ShareButton className="col-span-1" />
+              </div>
             </form>
           </motion.div>
         ) : null}
@@ -480,9 +486,12 @@ export const InputGroupIcon = ({
           <div className="flex flex-col items-center gap-4">
             <p>{message}</p>
             {hasMoved && (
-              <Button onClick={handleNext} variant="outline">
-                繼續銳評
-              </Button>
+              <div className="flex gap-4">
+                <Button onClick={handleNext} variant="outline">
+                  繼續銳評
+                </Button>
+                <ShareButton />
+              </div>
             )}
           </div>
         </div>
