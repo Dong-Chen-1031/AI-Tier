@@ -4,6 +4,7 @@ from re import sub
 from typing import Any, AsyncGenerator, Optional, TypeVar
 from uuid import uuid4
 
+import aiofiles
 from api import ai, tts
 from fastapi import HTTPException
 from settings import API_SERVICE_TIME_OUT
@@ -136,13 +137,17 @@ class ApiService:
                     )
                 )
             )
+            asyncio.create_task(self.save_tts())
 
     def tts_gen(self) -> AsyncGenerator[bytes, None]:
         if not self.tts:
-            raise HTTPException(
-                status_code=400, detail="TTS is disabled for this service"
-            )
+            raise HTTPException(status_code=400, detail="TTS is disabled for this case")
         return self.queue_to_async_gen(self.tts_queue_audio)
 
     def llm_gen(self) -> AsyncGenerator[str, None]:
         return self.queue_to_async_gen(self.queue_for_text)
+
+    async def save_tts(self):
+        async with aiofiles.open(f"storage/audio/{self.case_id}.mp3", "wb") as f:
+            async for chunk in self.queue_to_async_gen(self.tts_queue_save):
+                await f.write(chunk)

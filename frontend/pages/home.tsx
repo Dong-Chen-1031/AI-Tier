@@ -1,17 +1,18 @@
 import React, { useRef } from "react";
 import config from "../config/constants";
 import axios from "axios";
+import { InputGroupIcon } from "../components/input";
 
 interface TierRequest {
-  subject: string;
-  role_name?: string;
-  role_description?: string | false;
+  subject: string; //V
+  role_name?: string; //V
+  role_description?: string | false; //V
   tier?: string;
-  suggestion?: string | null;
-  tts?: boolean | null;
-  tts_model?: string | null;
-  tts_speed?: number | null;
-  llm_model?: string | null;
+  suggestion?: string | null; //V
+  tts?: boolean | null; //V
+  tts_model?: string | null; //V
+  tts_speed?: number | null; //V
+  llm_model?: string | null; //V
   style?: string | null;
 }
 
@@ -68,11 +69,32 @@ const Home: React.FC = () => {
       audioRef.current.play();
     }
   };
+
+  let colors = ["#F00", "#FFBF00", "#FF0", "#FFF2CC", "#FFF"];
   return (
-    <div>
+    <div className="h-[90%] mx-auto mt-10 w-[90%]">
       <audio ref={audioRef}></audio>
-      <p>{message}</p>
-      <button onClickCapture={callApi}>test</button>
+      <div className="grid grid-cols-1 gap-10 w-full h-full md:grid-cols-3">
+        <div className="col-span-1 h-full flex flex-col md:col-span-2">
+          {["夯", "頂級", "人上人", "NPC", "拉完了"].map((label, index) => (
+            <div
+              key={index}
+              className={`flex ${index !== 0 ? "mt-5" : ""} text-center`}
+            >
+              <div
+                className={`w-35 h-30 text-3xl flex items-center justify-center rounded-l-md`}
+                style={{ backgroundColor: colors[index] }}
+              >
+                <p className="text-accent font-medium">{label}</p>
+              </div>
+              <div className="w-full bg-card rounded-r-md"></div>
+            </div>
+          ))}
+        </div>
+        <div className="h-full bg-card p-5 rounded-md">
+          <InputGroupIcon />
+        </div>
+      </div>
     </div>
   );
 };

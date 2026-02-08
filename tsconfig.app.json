@@ -26,8 +26,9 @@
 
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["frontend/*"],
+      "@lib/*": ["frontend/lib/*"]
     }
   },
-  "include": ["src", "."]
+  "include": ["./", "../tsconfig.json"]
 }
