@@ -1,7 +1,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X } from "lucide-react";
-import { ReviewCase } from "../contexts/ReviewCaseContext";
+import type { ReviewCase } from "../contexts/ReviewCaseContext";
 
 interface CaseDetailModalProps {
   isOpen: boolean;

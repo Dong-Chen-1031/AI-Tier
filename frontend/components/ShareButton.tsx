@@ -6,7 +6,7 @@ import axios from "axios";
 import config from "../config/constants";
 
 export const ShareButton: React.FC = () => {
-  const { cases, exportToJSON } = useReviewCases();
+  const { cases } = useReviewCases();
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
 

@@ -76,7 +76,7 @@ export const InputGroupIcon = ({
     url: string;
   } | null>(null);
   const [audioFinished, setAudioFinished] = useState(false);
-  const [currentCaseId, setCurrentCaseId] = useState<string>("");
+  const [, setCurrentCaseId] = useState<string>("");
   const { addCase, updateCase } = useReviewCases();
 
   // Reset state when starting new
@@ -102,7 +102,7 @@ export const InputGroupIcon = ({
     }
   };
 
-  const streamText = async (case_id: string, currentImgUrl: string, formData: TierRequest) => {
+  const streamText = async (case_id: string, currentImgUrl: string) => {
     const response = await fetch(`${config.api_endpoints}/text/${case_id}`);
     if (!response.ok) {
       console.error("Failed to fetch stream:", response.statusText);
@@ -172,7 +172,7 @@ export const InputGroupIcon = ({
     });
 
     playAudio(case_id);
-    streamText(case_id, img_url, data);
+    streamText(case_id, img_url);
     return img_url;
   };
 

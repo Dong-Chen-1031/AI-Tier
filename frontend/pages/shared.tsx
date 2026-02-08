@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import config from "../config/constants";
-import { ReviewCase } from "../contexts/ReviewCaseContext";
+import type { ReviewCase } from "../contexts/ReviewCaseContext";
 import { motion } from "motion/react";
 import Loader from "../components/loader";
 import { CaseDetailModal } from "../components/CaseDetailModal";
