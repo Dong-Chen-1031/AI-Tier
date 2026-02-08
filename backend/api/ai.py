@@ -1,3 +1,4 @@
+import re
 from typing import Any, AsyncGenerator, Optional
 
 from dotenv import load_dotenv
@@ -44,6 +45,15 @@ async def stream_messages(
                     elif "]" in text and "[" not in text:
                         text = temp + text
                         temp = ""
+
+                    match_ = re.search(r"\[(.*?)\]", text)
+                    if match_:
+                        rank_content = match_.group(1)
+                        if full_content.count(rank_content) == 1:
+                            text = text.replace(
+                                match_.group(0), f"{rank_content}{match_.group(0)}"
+                            )
+
                     yield text
                 if chunk.choices[0].finish_reason:
                     return

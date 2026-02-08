@@ -32,21 +32,12 @@ const Home: React.FC = () => {
                 <div className="w-full bg-card rounded-r-md p-2 flex flex-wrap gap-2 items-center">
                   {tierImages[label]?.map((url, i) => (
                     <motion.div
-                      layoutId={
-                        // Only add layoutId to the latest added image to trigger transition from input
-                        i === tierImages[label]!.length - 1
-                          ? "subject-image"
-                          : undefined
-                      }
+                      layoutId={url}
                       key={i}
                       className="h-20 w-20 rounded-md overflow-hidden relative group"
                     >
                       <motion.img
-                        layoutId={
-                          i === tierImages[label]!.length - 1
-                            ? "subject-image-img"
-                            : undefined
-                        }
+                        layoutId={`${url}-img`}
                         src={url}
                         alt={label}
                         className="w-full h-full object-cover"

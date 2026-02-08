@@ -32,7 +32,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import config from "@/config/constants";
 import { motion } from "motion/react";
@@ -70,15 +70,30 @@ export const InputGroupIcon = ({
   const audioRef = useRef<HTMLAudioElement>(null);
   const [message, setMessage] = React.useState("");
   const [hasMoved, setHasMoved] = useState(false);
+  const [pendingDecision, setPendingDecision] = useState<{
+    tier: string;
+    url: string;
+  } | null>(null);
+  const [audioFinished, setAudioFinished] = useState(false);
 
   // Reset state when starting new
   const resetState = () => {
     setHasMoved(false);
     setMessage("");
+    setPendingDecision(null);
+    setAudioFinished(false);
   };
+
+  useEffect(() => {
+    if (pendingDecision && audioFinished && onDecided && !hasMoved) {
+      setHasMoved(true);
+      onDecided(pendingDecision.tier, pendingDecision.url);
+    }
+  }, [pendingDecision, audioFinished, onDecided, hasMoved]);
 
   const playAudio = async (case_id: string) => {
     if (audioRef.current) {
+      setAudioFinished(false);
       audioRef.current.src = `${config.api_endpoints}/tts/${case_id}`;
       audioRef.current.play();
     }
@@ -105,14 +120,13 @@ export const InputGroupIcon = ({
 
       const chunk = decoder.decode(value, { stream: true });
       fullText += chunk;
-      setMessage((prev) => prev + chunk);
+      setMessage(fullText.replace(/\[(夯|頂級|人上人|NPC|拉完了)\]/g, ""));
 
-      if (!decided && onDecided) {
+      if (!decided) {
         const match = fullText.match(/\[(夯|頂級|人上人|NPC|拉完了)\]/);
         if (match) {
           decided = true;
-          setHasMoved(true);
-          onDecided(match[1], currentImgUrl);
+          setPendingDecision({ tier: match[1], url: currentImgUrl });
         }
       }
     }
@@ -132,20 +146,21 @@ export const InputGroupIcon = ({
     return img_url;
   };
 
-  const { control, register, handleSubmit, watch } = useForm<TierRequest>({
-    defaultValues: {
-      subject: "",
-      role_name: "",
-      role_description: "",
-      suggestion: "",
-      tier: config.tierList[0],
-      llm_model: "gpt4",
-      style: "不指定",
-      tts_model: "",
-      tts_speed: 1.2,
-      tts: true,
-    },
-  });
+  const { control, register, handleSubmit, watch, setValue } =
+    useForm<TierRequest>({
+      defaultValues: {
+        subject: "",
+        role_name: "",
+        role_description: "",
+        suggestion: "",
+        tier: config.tierList[0],
+        llm_model: "gpt4",
+        style: "不指定",
+        tts_model: "",
+        tts_speed: 1.2,
+        tts: true,
+      },
+    });
 
   const speed = watch("tts_speed") || 1;
 
@@ -161,9 +176,15 @@ export const InputGroupIcon = ({
     setProgress("finished");
   };
 
+  const handleNext = () => {
+    setValue("subject", "");
+    resetState();
+    setProgress("setting");
+  };
+
   return (
     <>
-      <audio ref={audioRef}></audio>
+      <audio ref={audioRef} onEnded={() => setAudioFinished(true)}></audio>
 
       {progress === "setting" || progress === "loading" ? (
         <motion.div
@@ -420,10 +441,15 @@ export const InputGroupIcon = ({
         </motion.div>
       ) : (
         <div className="flex h-full w-full items-center justify-center flex-col gap-6">
-          {!hasMoved && (
-            <EnterAnimation imgUrl={imgUrl} layoutId="subject-image" />
-          )}
-          <p>{message}</p>
+          {!hasMoved && <EnterAnimation imgUrl={imgUrl} layoutId={imgUrl} />}
+          <div className="flex flex-col items-center gap-4">
+            <p>{message}</p>
+            {hasMoved && (
+              <Button onClick={handleNext} variant="outline">
+                繼續銳評
+              </Button>
+            )}
+          </div>
         </div>
       )}
     </>
