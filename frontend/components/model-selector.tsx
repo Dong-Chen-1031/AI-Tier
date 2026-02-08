@@ -17,7 +17,7 @@ interface Model {
 
 interface ModelSelectorProps {
   value?: string;
-  onSelect: (modelId: string) => void;
+  onSelect: (modelId: string, modelName: string) => void;
 }
 
 // Since we don't have a Dialog component in ui/, I'll build a custom simple modal here
@@ -65,7 +65,7 @@ export const ModelSelector = ({ value, onSelect }: ModelSelectorProps) => {
   };
 
   const handleSelect = (id: string, name: string) => {
-    onSelect(id);
+    onSelect(id, name);
     setModelName(name);
     // Stop playing audio when a model is selected
     if (audioRef.current) {
@@ -148,7 +148,7 @@ export const ModelSelector = ({ value, onSelect }: ModelSelectorProps) => {
                           src={
                             model.cover_image
                               ? `https://public-platform.r2.fish.audio/cdn-cgi/image/width=128,format=webp/${model.cover_image}`
-                              : "https://public-platform.r2.fish.audio/cdn-cgi/image/width=128,format=webp/coverimage/bc3a7eb87a7744e7876657b0f6254d90"
+                              : "https://placehold.co/400?text=No+Cover+Img%5CnSad"
                           }
                           alt={model.title}
                           className="h-full w-full object-cover"

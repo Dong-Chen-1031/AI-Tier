@@ -59,14 +59,23 @@ export interface TierRequest {
 
 export const InputGroupIcon = ({
   onDecided,
+  onStreamComplete,
 }: {
-  onDecided?: (tier: string, url: string) => void;
+  onDecided?: (data: {
+    id: string;
+    tier: string;
+    url: string;
+    subject: string;
+    roleName?: string;
+  }) => void;
+  onStreamComplete?: (message: string, id: string) => void;
 }) => {
   const [editLevel, setEditLevel] = useState(false);
   const [progress, setProgress] = useState<"setting" | "loading" | "finished">(
     "setting",
   );
   const [imgUrl, setImgUrl] = useState<string>("");
+  const [caseId, setCaseId] = useState<string>("");
   const audioRef = useRef<HTMLAudioElement>(null);
   const [message, setMessage] = React.useState("");
   const [hasMoved, setHasMoved] = useState(false);
@@ -75,6 +84,22 @@ export const InputGroupIcon = ({
     url: string;
   } | null>(null);
   const [audioFinished, setAudioFinished] = useState(false);
+
+  const { control, register, handleSubmit, watch, setValue, getValues } =
+    useForm<TierRequest>({
+      defaultValues: {
+        subject: "",
+        role_name: "",
+        role_description: "",
+        suggestion: "",
+        tier: config.tierList[0],
+        llm_model: "gpt4",
+        style: "不指定",
+        tts_model: "",
+        tts_speed: 1,
+        tts: true,
+      },
+    });
 
   // Reset state when starting new
   const resetState = () => {
@@ -87,9 +112,16 @@ export const InputGroupIcon = ({
   useEffect(() => {
     if (pendingDecision && audioFinished && onDecided && !hasMoved) {
       setHasMoved(true);
-      onDecided(pendingDecision.tier, pendingDecision.url);
+      const { subject, role_name } = getValues();
+      onDecided({
+        id: caseId,
+        tier: pendingDecision.tier,
+        url: pendingDecision.url,
+        subject,
+        roleName: role_name,
+      });
     }
-  }, [pendingDecision, audioFinished, onDecided, hasMoved]);
+  }, [pendingDecision, audioFinished, onDecided, hasMoved, getValues, caseId]);
 
   const playAudio = async (case_id: string) => {
     if (audioRef.current) {
@@ -116,7 +148,15 @@ export const InputGroupIcon = ({
 
     while (true) {
       const { value, done } = await reader.read();
-      if (done) break;
+      if (done) {
+        if (onStreamComplete) {
+          onStreamComplete(
+            fullText.replace(/\[(夯|頂級|人上人|NPC|拉完了)\]/g, ""),
+            case_id,
+          );
+        }
+        break;
+      }
 
       const chunk = decoder.decode(value, { stream: true });
       fullText += chunk;
@@ -140,27 +180,12 @@ export const InputGroupIcon = ({
 
     // Set ImgUrl state for local display until it moves
     setImgUrl(img_url);
+    setCaseId(case_id);
 
     playAudio(case_id);
     streamText(case_id, img_url);
-    return img_url;
+    return { img_url, case_id };
   };
-
-  const { control, register, handleSubmit, watch, setValue } =
-    useForm<TierRequest>({
-      defaultValues: {
-        subject: "",
-        role_name: "",
-        role_description: "",
-        suggestion: "",
-        tier: config.tierList[0],
-        llm_model: "gpt4",
-        style: "不指定",
-        tts_model: "",
-        tts_speed: 1.2,
-        tts: true,
-      },
-    });
 
   const speed = watch("tts_speed") || 1;
 
@@ -171,8 +196,7 @@ export const InputGroupIcon = ({
     }
 
     setProgress("loading");
-    const img_url = await startTier(payload);
-    setImgUrl(img_url);
+    await startTier(payload);
     setProgress("finished");
   };
 
@@ -369,7 +393,12 @@ export const InputGroupIcon = ({
                 render={({ field }) => (
                   <ModelSelector
                     value={field.value ?? undefined}
-                    onSelect={field.onChange}
+                    onSelect={(id, name) => {
+                      field.onChange(id);
+                      if (!getValues("role_name")) {
+                        setValue("role_name", name);
+                      }
+                    }}
                   />
                 )}
               />
@@ -441,7 +470,8 @@ export const InputGroupIcon = ({
         </motion.div>
       ) : (
         <div className="flex h-full w-full items-center justify-center flex-col gap-6">
-          {!hasMoved && <EnterAnimation imgUrl={imgUrl} layoutId={imgUrl} />}
+          {console.log(caseId) === void 0 ||
+            (!hasMoved && <EnterAnimation imgUrl={imgUrl} layoutId={caseId} />)}
           <div className="flex flex-col items-center gap-4">
             <p>{message}</p>
             {hasMoved && (

@@ -1,4 +1,4 @@
-import * as motion from "motion/react-client";
+import { motion } from "motion/react";
 import { useState } from "react";
 
 export default function EnterAnimation({
@@ -22,7 +22,7 @@ export default function EnterAnimation({
       className="h-20 w-20 rounded-md overflow-hidden relative"
     >
       <motion.img
-        layoutId={layoutId ? `${layoutId}-img` : undefined}
+        // layoutId={layoutId ? `${layoutId}-img` : undefined}
         src={imgUrl}
         onLoad={() => setIsLoaded(true)}
         className="w-full h-full object-cover"
