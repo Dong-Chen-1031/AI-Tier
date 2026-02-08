@@ -48,7 +48,7 @@ const Home: React.FC = () => {
               </div>
             ))}
           </div>
-          <div className="h-full bg-card p-5 rounded-md">
+          <div className="h-full bg-card p-5 rounded-md overflow-hidden">
             <InputGroupIcon onDecided={handleTierDecided} />
           </div>
         </div>
