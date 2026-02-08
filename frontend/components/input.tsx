@@ -20,7 +20,6 @@ import {
   FieldGroup,
 } from "@/components/ui/field";
 import {
-  MicVocalIcon,
   MessageCircleQuestionMarkIcon,
   BookUserIcon,
   CompassIcon,
@@ -33,13 +32,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import config from "@/config/constants";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import EnterAnimation from "./subject";
 import { useForm, Controller, type SubmitHandler } from "react-hook-form";
 import Loader from "./loader";
+
+import { ModelSelector } from "./model-selector";
+import React from "react";
+import axios from "axios";
 
 export interface TierRequest {
   subject: string; //V
@@ -55,15 +58,79 @@ export interface TierRequest {
 }
 
 export const InputGroupIcon = ({
-  whenSubmit,
+  onDecided,
 }: {
-  whenSubmit: (data: TierRequest) => Promise<string>;
+  onDecided?: (tier: string, url: string) => void;
 }) => {
   const [editLevel, setEditLevel] = useState(false);
   const [progress, setProgress] = useState<"setting" | "loading" | "finished">(
     "setting",
   );
   const [imgUrl, setImgUrl] = useState<string>("");
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [message, setMessage] = React.useState("");
+  const [hasMoved, setHasMoved] = useState(false);
+
+  // Reset state when starting new
+  const resetState = () => {
+    setHasMoved(false);
+    setMessage("");
+  };
+
+  const playAudio = async (case_id: string) => {
+    if (audioRef.current) {
+      audioRef.current.src = `${config.api_endpoints}/tts/${case_id}`;
+      audioRef.current.play();
+    }
+  };
+
+  const streamText = async (case_id: string, currentImgUrl: string) => {
+    const response = await fetch(`${config.api_endpoints}/text/${case_id}`);
+    if (!response.ok) {
+      console.error("Failed to fetch stream:", response.statusText);
+      return;
+    }
+    if (!response.body) {
+      console.error("No response body found");
+      return;
+    }
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = "";
+    let decided = false;
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value, { stream: true });
+      fullText += chunk;
+      setMessage((prev) => prev + chunk);
+
+      if (!decided && onDecided) {
+        const match = fullText.match(/\[(夯|頂級|人上人|NPC|拉完了)\]/);
+        if (match) {
+          decided = true;
+          setHasMoved(true);
+          onDecided(match[1], currentImgUrl);
+        }
+      }
+    }
+  };
+
+  const startTier = async (data: TierRequest) => {
+    resetState();
+    const response = await axios.post(`${config.api_endpoints}/tier`, data);
+    const case_id = response.data.case_id;
+    const img_url = response.data.img_url;
+
+    // Set ImgUrl state for local display until it moves
+    setImgUrl(img_url);
+
+    playAudio(case_id);
+    streamText(case_id, img_url);
+    return img_url;
+  };
 
   const { control, register, handleSubmit, watch } = useForm<TierRequest>({
     defaultValues: {
@@ -75,7 +142,7 @@ export const InputGroupIcon = ({
       llm_model: "gpt4",
       style: "不指定",
       tts_model: "",
-      tts_speed: 1.0,
+      tts_speed: 1.2,
       tts: true,
     },
   });
@@ -83,22 +150,21 @@ export const InputGroupIcon = ({
   const speed = watch("tts_speed") || 1;
 
   const onSubmit: SubmitHandler<TierRequest> = async (data) => {
-    // If editLevel is false, we might want to clear the 'tier' or handle it
-    // depending on backend requirement. Assuming we just send what's in the form
-    // or arguably set tier to undefined if editLevel is false.
     const payload = { ...data };
     if (!editLevel) {
       delete payload.tier;
     }
 
     setProgress("loading");
-    const img_url = await whenSubmit(payload);
+    const img_url = await startTier(payload);
     setImgUrl(img_url);
     setProgress("finished");
   };
 
   return (
-    <AnimatePresence initial={false}>
+    <>
+      <audio ref={audioRef}></audio>
+
       {progress === "setting" || progress === "loading" ? (
         <motion.div
           animate={{ opacity: 1, scale: 1 }}
@@ -276,25 +342,18 @@ export const InputGroupIcon = ({
             <FieldSeparator />
 
             <Field className="gap-1">
-              <InputGroup>
-                <InputGroupInput
-                  placeholder="Fish Audio 模型 ID"
-                  {...register("tts_model")}
-                />
-                <InputGroupAddon>
-                  <MicVocalIcon />
-                </InputGroupAddon>
-              </InputGroup>
+              <Controller
+                control={control}
+                name="tts_model"
+                render={({ field }) => (
+                  <ModelSelector
+                    value={field.value ?? undefined}
+                    onSelect={field.onChange}
+                  />
+                )}
+              />
               <FieldDescription className="text-primary/50 text-left text-xs ml-1">
-                請至{" "}
-                <a
-                  href="https://fish.audio/app/discovery/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Fish Audio
-                </a>{" "}
-                官網選擇模型，並輸入 ID
+                可直接搜尋並試聽選擇語音模型
               </FieldDescription>
             </Field>
 
@@ -360,10 +419,13 @@ export const InputGroupIcon = ({
           </form>
         </motion.div>
       ) : (
-        <div className="flex h-full w-full items-center justify-center">
-          <EnterAnimation imgUrl={imgUrl} />
+        <div className="flex h-full w-full items-center justify-center flex-col gap-6">
+          {!hasMoved && (
+            <EnterAnimation imgUrl={imgUrl} layoutId="subject-image" />
+          )}
+          <p>{message}</p>
         </div>
       )}
-    </AnimatePresence>
+    </>
   );
 };

@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 from fishaudio import AsyncFishAudio
 from rich.traceback import install
 from settings import FISH_API_KEY
-from utils.log import logger
 
 converter_s2t = opencc.OpenCC("s2t")
 
@@ -62,5 +61,9 @@ async def get_models(title: str) -> list[dict[str, Any]]:
         headers = {"Authorization": f"Bearer {FISH_API_KEY}"}
 
         response = await client.get(url, headers=headers)
-        logger.info(f"獲取模型列表的響應: {response.text}")
-        return response.json().get("items", [])
+        # logger.info(f"獲取模型列表的響應: {response.text}")
+        items = response.json().get("items", [])
+        for item in items:
+            item["title"] = s2t(item["title"])
+            item["description"] = s2t(item["description"])
+        return items
