@@ -20,6 +20,7 @@ import {
   FieldDescription,
   FieldSeparator,
   FieldLabel,
+  FieldGroup,
 } from "@/components/ui/field";
 import {
   MicVocalIcon,
@@ -29,29 +30,48 @@ import {
   UserIcon,
   SpeechIcon,
   GaugeIcon,
-  GuitarIcon,
+  SettingsIcon,
+  AudioLinesIcon,
+  Key,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { useState } from "react";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import config from "@/config/constants";
 
-export function InputGroupIcon() {
+export const InputGroupIcon = ({
+  whenSubmit,
+}: {
+  whenSubmit: () => Promise<void>;
+}) => {
   const [speed, setSpeed] = useState(1);
+  const [editLevel, setEditLevel] = useState(false);
   return (
     <div className="grid w-full gap-6">
-      <InputGroup>
-        <InputGroupInput placeholder="銳評目標..." />
-        <InputGroupAddon>
-          <CompassIcon />
-        </InputGroupAddon>
-      </InputGroup>
-      <InputGroup>
-        <InputGroupInput placeholder="銳評者..." />
-        <InputGroupAddon>
-          <UserIcon />
-        </InputGroupAddon>
-      </InputGroup>
+      <FieldGroup>
+        <div className="grid grid-cols-2 gap-4">
+          <Field>
+            {/* <FieldLabel htmlFor="city"></FieldLabel> */}
+            <InputGroup>
+              <InputGroupInput type="text" placeholder="銳評目標" />
+              <InputGroupAddon>
+                <CompassIcon />
+              </InputGroupAddon>
+            </InputGroup>
+          </Field>
+          <Field>
+            {/* <FieldLabel htmlFor="city"></FieldLabel> */}
+            <InputGroup>
+              <InputGroupInput type="text" placeholder="銳評者 [可選]" />
+              <InputGroupAddon>
+                <UserIcon />
+              </InputGroupAddon>
+            </InputGroup>
+          </Field>
+        </div>
+      </FieldGroup>
 
       <InputGroup>
         <InputGroupInput placeholder="銳評者描述 [可選]" />
@@ -66,11 +86,49 @@ export function InputGroupIcon() {
           <MessageCircleQuestionMarkIcon />
         </InputGroupAddon>
       </InputGroup>
+      <div className="flex flex-col gap-0 w-full">
+        <Field orientation="horizontal" className="pl-1">
+          <FieldLabel
+            htmlFor="terms-checkbox-basic"
+            className="text-primary font-light"
+          >
+            <SettingsIcon className="text-primary w-3.5 min-w-3.5" />
+
+            <p className="w-fit min-w-16">是否指定銳評等級</p>
+          </FieldLabel>
+          <Switch
+            id="airplane-mode"
+            className="cursor-pointer"
+            checked={editLevel}
+            onCheckedChange={(checked) => setEditLevel(checked)}
+          />
+        </Field>
+        <ToggleGroup
+          type="single"
+          // defaultValue={config.tierList[0]}
+          variant="outline"
+          className={`w-max-full transition-all ease-in-out duration-300 overflow-hidden 
+            ${editLevel ? "max-h-40 opacity-100 translate-y-0m mt-4" : "max-h-0 opacity-0 -translate-y-1 mt-0"}
+          `}
+        >
+          {config.tierList.map((label, index) => (
+            <ToggleGroupItem
+              key={index}
+              value={label}
+              aria-label={`選擇 ${label}`}
+              // style={{ backgroundColor: config.colorList[index] }}
+              className="w-[20%] cursor-pointer"
+            >
+              {label}
+            </ToggleGroupItem>
+          ))}
+        </ToggleGroup>
+      </div>
       <FieldSeparator />
       <Field orientation="horizontal">
         <FieldLabel
           htmlFor="terms-checkbox-basic"
-          className="text-primary font-light"
+          className="text-primary font-light pl-1"
         >
           選擇大語言模型
         </FieldLabel>
@@ -93,9 +151,9 @@ export function InputGroupIcon() {
       <Field orientation="horizontal">
         <FieldLabel
           htmlFor="terms-checkbox-basic"
-          className="text-primary font-light"
+          className="text-primary font-light pl-1"
         >
-          選擇風格 [可選]
+          選擇風格
         </FieldLabel>
         <Select defaultValue="不指定">
           <SelectTrigger className="w-full max-w-48 select-none">
@@ -136,39 +194,40 @@ export function InputGroupIcon() {
         </FieldDescription>
       </Field>
 
-      <Field orientation="horizontal">
-        <GaugeIcon className="w-4 text-primary" />
+      <Field orientation="horizontal" className="pl-1">
+        <GaugeIcon className="text-primary w-3.5 min-w-3.5" />
         <FieldLabel
           htmlFor="terms-checkbox-basic"
           className="text-primary font-light"
         >
-          朗讀速度
-          <code>{speed}</code>
+          <p className="w-fit min-w-16">朗讀速度</p>
+          <code>{speed.toFixed(1)}</code>
         </FieldLabel>
         <Slider
           defaultValue={[speed]}
           max={2}
           min={0.1}
           step={0.01}
-          className="mx-auto max-w-[60%] "
+          className="mx-auto w-full select-none"
           // value={[speed]}
           onValueChange={(value) => setSpeed(Math.round(value[0] * 10) / 10)}
         />
       </Field>
-      <Field orientation="horizontal">
+      <Field orientation="horizontal" className="pl-1">
+        <AudioLinesIcon className="text-primary w-3.5 min-w-3.5" />
         <FieldLabel
           htmlFor="terms-checkbox-basic"
           className="text-primary font-light"
         >
-          啟用文字朗讀功能
+          <p className="w-fit min-w-16">啟用文字朗讀功能</p>
         </FieldLabel>
         <Switch id="airplane-mode" defaultChecked className="cursor-pointer" />
       </Field>
 
-      <Button className="cursor-pointer" variant="outline">
+      <Button className="cursor-pointer" variant="outline" onClick={whenSubmit}>
         <SpeechIcon />
         開始銳評
       </Button>
     </div>
   );
-}
+};

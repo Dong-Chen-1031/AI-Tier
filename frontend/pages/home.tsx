@@ -20,7 +20,7 @@ const Home: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [message, setMessage] = React.useState("");
 
-  const callApi = async () => {
+  const startTier = async () => {
     setMessage("");
     let requestData: TierRequest = {
       subject: "蔣中正",
@@ -70,20 +70,19 @@ const Home: React.FC = () => {
     }
   };
 
-  let colors = ["#F00", "#FFBF00", "#FF0", "#FFF2CC", "#FFF"];
   return (
     <div className="h-[90%] mx-auto mt-10 w-[90%]">
       <audio ref={audioRef}></audio>
       <div className="grid grid-cols-1 gap-10 w-full h-full md:grid-cols-3">
         <div className="col-span-1 h-full flex flex-col md:col-span-2">
-          {["夯", "頂級", "人上人", "NPC", "拉完了"].map((label, index) => (
+          {config.tierList.map((label, index) => (
             <div
               key={index}
               className={`flex ${index !== 0 ? "mt-5" : ""} text-center`}
             >
               <div
                 className={`w-35 h-30 text-3xl flex items-center justify-center rounded-l-md`}
-                style={{ backgroundColor: colors[index] }}
+                style={{ backgroundColor: config.colorList[index] }}
               >
                 <p className="text-accent font-medium">{label}</p>
               </div>
@@ -92,7 +91,7 @@ const Home: React.FC = () => {
           ))}
         </div>
         <div className="h-full bg-card p-5 rounded-md">
-          <InputGroupIcon />
+          <InputGroupIcon whenSubmit={startTier} />
         </div>
       </div>
     </div>
