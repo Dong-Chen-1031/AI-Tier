@@ -1,14 +1,15 @@
-from tkinter import N
 from typing import Literal, Optional
 from uuid import uuid4
 
-import settings  # noqa: E402
-from api.services import ApiService  # noqa: E402
-from fastapi import FastAPI  # noqa: E402
-from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
+import settings
+from api import Tts
+from api.img import search_images
+from api.services import ApiService
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from starlette.responses import StreamingResponse
-from utils.log import logger  # noqa: E402
+from utils.log import logger
 
 app = FastAPI()
 
@@ -32,7 +33,7 @@ def if_exists(string: str, *args, **kwargs) -> str:
 class TierRequest(BaseModel):
     subject: str
     role_name: str = "銳評AI"
-    role_description: Optional[str] = N
+    role_description: Optional[str] = None
     tier: Optional[Tiers] = None
     suggestion: Optional[str] = None
     tts: Optional[bool] = None
@@ -81,8 +82,9 @@ class TierRequest(BaseModel):
         return prompt
 
 
-class UUIDResponse(BaseModel):
+class TierResponse(BaseModel):
     case_id: str
+    img_url: str
 
 
 @app.get("/tts/{case_id}")
@@ -101,8 +103,8 @@ async def text(case_id: str) -> StreamingResponse:
     )
 
 
-@app.post("/tier", response_model=UUIDResponse)
-async def chat(chat_input: TierRequest) -> UUIDResponse:
+@app.post("/tier", response_model=TierResponse)
+async def chat(chat_input: TierRequest) -> TierResponse:
     """處理聊天請求，返回一個唯一的 UUID 以識別這次對話"""
     uuid = uuid4().hex
 
@@ -113,8 +115,17 @@ async def chat(chat_input: TierRequest) -> UUIDResponse:
         tts_speed=chat_input.tts_speed,
     ).start()
 
+    img_url = await search_images(chat_input.subject)
+
     # print(f"Received message: {chat_input}")
 
     logger.info(f"Received request: {chat_input}")
 
-    return UUIDResponse(case_id=uuid)
+    return TierResponse(case_id=uuid, img_url=img_url[0] if img_url else "")
+
+
+@app.get("/models/{model_name}")
+async def get_model(model_name: str):
+    """獲取模型列表"""
+    models = await Tts.get_models(model_name)
+    return models

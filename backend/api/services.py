@@ -5,7 +5,7 @@ from typing import Any, AsyncGenerator, Optional, TypeVar
 from uuid import uuid4
 
 import aiofiles
-from api import ai, tts
+from api import Tts, ai
 from fastapi import HTTPException
 from settings import API_SERVICE_TIME_OUT
 from utils.log import logger
@@ -46,7 +46,7 @@ class ApiService:
         tts_speed: Optional[float] = None,
     ):
         self.prompt = prompt
-        self.tts_model = tts_model
+        self.tts_model = tts_model or None
         self.llm_model = llm_model
         self.tts_speed = tts_speed
         self.case_id = case_id or uuid4().hex
@@ -132,7 +132,7 @@ class ApiService:
         if self.tts:
             asyncio.create_task(
                 self.tts_broadcaster.publish(
-                    tts.websocket_tts(
+                    Tts.websocket_tts(
                         self._gen_for_tts(), model=self.tts_model, speed=self.tts_speed
                     )
                 )

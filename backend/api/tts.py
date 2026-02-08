@@ -1,9 +1,34 @@
 from typing import Any, AsyncGenerator, Optional
 
+import httpx
+import opencc
 from dotenv import load_dotenv
 from fishaudio import AsyncFishAudio
 from rich.traceback import install
 from settings import FISH_API_KEY
+from utils.log import logger
+
+converter_s2t = opencc.OpenCC("s2t")
+
+
+def s2t(text: str):
+    """將簡體中文轉換為繁體中文"""
+    if not text:
+        return text
+    _ = converter_s2t.convert(text)
+    # logging.info(f"轉換前: {text} 轉換後: {_}")
+    return _
+
+
+converter_t2s = opencc.OpenCC("t2s")
+
+
+def t2s(text: str):
+    """將繁體中文轉換為簡體中文"""
+    if not text:
+        return text
+    return converter_t2s.convert(text)
+
 
 install()
 
@@ -27,3 +52,15 @@ def websocket_tts(
     )
 
     return audio_stream
+
+
+async def get_models(title: str) -> list[dict[str, Any]]:
+    async with httpx.AsyncClient() as client:
+        title = t2s(title)
+        url = f"https://api.fish.audio/model?page_size=10&page_number=1&sort_by=score&title={title}"
+
+        headers = {"Authorization": f"Bearer {FISH_API_KEY}"}
+
+        response = await client.get(url, headers=headers)
+        logger.info(f"獲取模型列表的響應: {response.text}")
+        return response.json().get("items", [])

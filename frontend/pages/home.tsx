@@ -1,43 +1,20 @@
 import React, { useRef } from "react";
 import config from "../config/constants";
 import axios from "axios";
-import { InputGroupIcon } from "../components/input";
-
-interface TierRequest {
-  subject: string; //V
-  role_name?: string; //V
-  role_description?: string | false; //V
-  tier?: string;
-  suggestion?: string | null; //V
-  tts?: boolean | null; //V
-  tts_model?: string | null; //V
-  tts_speed?: number | null; //V
-  llm_model?: string | null; //V
-  style?: string | null;
-}
+import { InputGroupIcon, type TierRequest } from "../components/input";
 
 const Home: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [message, setMessage] = React.useState("");
 
-  const startTier = async () => {
+  const startTier = async (data: TierRequest) => {
     setMessage("");
-    let requestData: TierRequest = {
-      subject: "蔣中正",
-      role_name: "孫中山",
-      tts_model: "339a6814818044f7b00161c8e0dd6e35",
-      tts_speed: 1.3,
-    };
-    axios
-      .post(`${config.api_endpoints}/tier`, requestData)
-      .then((response) => {
-        const case_id = response.data.case_id;
-        playAudio(case_id);
-        streamText(case_id);
-      })
-      .catch((error) => {
-        console.error("Error calling API:", error);
-      });
+    const response = await axios.post(`${config.api_endpoints}/tier`, data);
+    const case_id = response.data.case_id;
+    const img_url = response.data.img_url;
+    playAudio(case_id);
+    streamText(case_id);
+    return img_url;
   };
 
   const streamText = async (case_id: string) => {
