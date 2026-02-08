@@ -43,6 +43,7 @@ import Loader from "./loader";
 import { ModelSelector } from "./model-selector";
 import React from "react";
 import axios from "axios";
+import { useReviewCases } from "../contexts/ReviewCaseContext";
 
 export interface TierRequest {
   subject: string; //V
@@ -75,6 +76,8 @@ export const InputGroupIcon = ({
     url: string;
   } | null>(null);
   const [audioFinished, setAudioFinished] = useState(false);
+  const [currentCaseId, setCurrentCaseId] = useState<string>("");
+  const { addCase, updateCase } = useReviewCases();
 
   // Reset state when starting new
   const resetState = () => {
@@ -99,7 +102,7 @@ export const InputGroupIcon = ({
     }
   };
 
-  const streamText = async (case_id: string, currentImgUrl: string) => {
+  const streamText = async (case_id: string, currentImgUrl: string, formData: TierRequest) => {
     const response = await fetch(`${config.api_endpoints}/text/${case_id}`);
     if (!response.ok) {
       console.error("Failed to fetch stream:", response.statusText);
@@ -120,13 +123,19 @@ export const InputGroupIcon = ({
 
       const chunk = decoder.decode(value, { stream: true });
       fullText += chunk;
-      setMessage(fullText.replace(/\[(夯|頂級|人上人|NPC|拉完了)\]/g, ""));
+      const cleanText = fullText.replace(/\[(夯|頂級|人上人|NPC|拉完了)\]/g, "");
+      setMessage(cleanText);
+      
+      // Update streaming text in global state
+      updateCase(case_id, { streamingText: fullText, reply: cleanText });
 
       if (!decided) {
         const match = fullText.match(/\[(夯|頂級|人上人|NPC|拉完了)\]/);
         if (match) {
           decided = true;
           setPendingDecision({ tier: match[1], url: currentImgUrl });
+          // Update tier decision in global state
+          updateCase(case_id, { tierDecision: match[1] });
         }
       }
     }
@@ -140,9 +149,30 @@ export const InputGroupIcon = ({
 
     // Set ImgUrl state for local display until it moves
     setImgUrl(img_url);
+    setCurrentCaseId(case_id);
+    
+    // Add case to global state
+    addCase({
+      caseId: case_id,
+      imageUrl: img_url,
+      formData: {
+        subject: data.subject,
+        role_name: data.role_name,
+        role_description: data.role_description as string | undefined,
+        tier: data.tier,
+        suggestion: data.suggestion || undefined,
+        tts: data.tts || undefined,
+        tts_model: data.tts_model || undefined,
+        tts_speed: data.tts_speed || undefined,
+        llm_model: data.llm_model || undefined,
+        style: data.style || undefined,
+      },
+      streamingText: "",
+      reply: "",
+    });
 
     playAudio(case_id);
-    streamText(case_id, img_url);
+    streamText(case_id, img_url, data);
     return img_url;
   };
 

@@ -1,12 +1,15 @@
 from typing import Literal, Optional
 from uuid import uuid4
+import json
+from pathlib import Path
 
 import settings
 from api import Tts
 from api.img import search_images
 from api.services import ApiService
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from starlette.responses import StreamingResponse
 from utils.log import logger
@@ -22,6 +25,10 @@ app.add_middleware(
     allow_headers=["*"],  # 允許所有 headers
 )
 logger.info(f"CORS allow origin: {settings.FRONTEND_URL}")
+
+# Create directory for storing shared cases
+SHARED_CASES_DIR = Path("./backend/shared_cases")
+SHARED_CASES_DIR.mkdir(exist_ok=True)
 
 Tiers = Literal["夯", "頂級", "人上人", "NPC", "拉完了"]
 
@@ -130,3 +137,46 @@ async def get_model(model_name: str):
     """獲取模型列表"""
     models = await Tts.get_models(model_name)
     return models
+
+
+class SaveCasesRequest(BaseModel):
+    """保存案例的請求模型"""
+    cases: list
+
+
+@app.post("/save-cases")
+async def save_cases(request: SaveCasesRequest):
+    """保存所有案例到 JSON 文件"""
+    try:
+        share_id = uuid4().hex
+        file_path = SHARED_CASES_DIR / f"{share_id}.json"
+        
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(request.cases, f, ensure_ascii=False, indent=2)
+        
+        logger.info(f"Saved cases to {file_path}")
+        return {"share_id": share_id, "message": "Cases saved successfully"}
+    except Exception as e:
+        logger.error(f"Failed to save cases: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/share/{share_id}")
+async def get_shared_cases(share_id: str):
+    """根據分享 ID 獲取案例數據"""
+    try:
+        file_path = SHARED_CASES_DIR / f"{share_id}.json"
+        
+        if not file_path.exists():
+            raise HTTPException(status_code=404, detail="Shared case not found")
+        
+        with open(file_path, "r", encoding="utf-8") as f:
+            cases = json.load(f)
+        
+        logger.info(f"Retrieved shared cases: {share_id}")
+        return {"cases": cases}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to retrieve shared cases: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
