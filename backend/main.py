@@ -139,9 +139,34 @@ async def get_model(model_name: str):
     return models
 
 
+class ReviewCaseFormData(BaseModel):
+    """表單數據模型"""
+    subject: str
+    role_name: Optional[str] = None
+    role_description: Optional[str] = None
+    tier: Optional[str] = None
+    suggestion: Optional[str] = None
+    tts: Optional[bool] = None
+    tts_model: Optional[str] = None
+    tts_speed: Optional[float] = None
+    llm_model: Optional[str] = None
+    style: Optional[str] = None
+
+
+class ReviewCaseModel(BaseModel):
+    """單個案例的數據模型"""
+    caseId: str
+    timestamp: int
+    formData: ReviewCaseFormData
+    imageUrl: str
+    streamingText: str
+    reply: str
+    tierDecision: Optional[str] = None
+
+
 class SaveCasesRequest(BaseModel):
     """保存案例的請求模型"""
-    cases: list
+    cases: list[ReviewCaseModel]
 
 
 @app.post("/save-cases")
@@ -151,8 +176,11 @@ async def save_cases(request: SaveCasesRequest):
         share_id = uuid4().hex
         file_path = SHARED_CASES_DIR / f"{share_id}.json"
         
+        # Convert Pydantic models to dict for JSON serialization
+        cases_dict = [case.model_dump() for case in request.cases]
+        
         with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(request.cases, f, ensure_ascii=False, indent=2)
+            json.dump(cases_dict, f, ensure_ascii=False, indent=2)
         
         logger.info(f"Saved cases to {file_path}")
         return {"share_id": share_id, "message": "Cases saved successfully"}

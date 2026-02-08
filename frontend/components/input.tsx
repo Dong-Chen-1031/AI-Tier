@@ -76,7 +76,6 @@ export const InputGroupIcon = ({
     url: string;
   } | null>(null);
   const [audioFinished, setAudioFinished] = useState(false);
-  const [, setCurrentCaseId] = useState<string>("");
   const { addCase, updateCase } = useReviewCases();
 
   // Reset state when starting new
@@ -149,7 +148,6 @@ export const InputGroupIcon = ({
 
     // Set ImgUrl state for local display until it moves
     setImgUrl(img_url);
-    setCurrentCaseId(case_id);
     
     // Add case to global state
     addCase({
