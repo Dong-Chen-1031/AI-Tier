@@ -26,6 +26,7 @@ dist-ssr
 */key
 
 backend/storage/*
+backend/shared_cases/
 package-lock.json
 
 # Logs
@@ -44,6 +45,10 @@ node_modules
 dist
 dist-ssr
 *.local
+
+# Python lib directories
+/lib/
+/lib64/
 
 # Environment variables
 .env
