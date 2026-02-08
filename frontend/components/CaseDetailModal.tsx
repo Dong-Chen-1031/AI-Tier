@@ -2,6 +2,7 @@ import React from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X } from "lucide-react";
 import type { ReviewCase } from "../contexts/ReviewCaseContext";
+import config from "../config/constants";
 
 interface CaseDetailModalProps {
   isOpen: boolean;
@@ -106,7 +107,16 @@ export const CaseDetailModal: React.FC<CaseDetailModalProps> = ({
                       <h3 className="text-sm font-semibold text-primary mb-2">
                         銳評內容
                       </h3>
-                      <p className="text-foreground">{caseData.reply}</p>
+                      <p className="text-foreground mb-4">{caseData.reply}</p>
+                      {caseData.formData.tts && (
+                        <audio
+                          controls
+                          className="w-full mt-2"
+                          src={`${config.api_endpoints}/storage/audio/${caseData.caseId}.mp3`}
+                        >
+                          您的瀏覽器不支援音訊元素。
+                        </audio>
+                      )}
                     </div>
                   )}
 

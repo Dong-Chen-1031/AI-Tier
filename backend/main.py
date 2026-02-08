@@ -1,7 +1,7 @@
-from typing import Literal, Optional
-from uuid import uuid4
 import json
 from pathlib import Path
+from typing import Literal, Optional
+from uuid import uuid4
 
 import settings
 from api import Tts
@@ -9,7 +9,7 @@ from api.img import search_images
 from api.services import ApiService
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from starlette.responses import StreamingResponse
 from utils.log import logger
@@ -26,8 +26,12 @@ app.add_middleware(
 )
 logger.info(f"CORS allow origin: {settings.FRONTEND_URL}")
 
+# Mount storage directory
+app.mount("/storage", StaticFiles(directory="storage"), name="storage")
+
+
 # Create directory for storing shared cases
-SHARED_CASES_DIR = Path("./backend/shared_cases")
+SHARED_CASES_DIR = Path("./storage/shared_cases")
 SHARED_CASES_DIR.mkdir(exist_ok=True)
 
 Tiers = Literal["夯", "頂級", "人上人", "NPC", "拉完了"]
@@ -141,6 +145,7 @@ async def get_model(model_name: str):
 
 class ReviewCaseFormData(BaseModel):
     """表單數據模型"""
+
     subject: str
     role_name: Optional[str] = None
     role_description: Optional[str] = None
@@ -155,6 +160,7 @@ class ReviewCaseFormData(BaseModel):
 
 class ReviewCaseModel(BaseModel):
     """單個案例的數據模型"""
+
     caseId: str
     timestamp: int
     formData: ReviewCaseFormData
@@ -166,6 +172,7 @@ class ReviewCaseModel(BaseModel):
 
 class SaveCasesRequest(BaseModel):
     """保存案例的請求模型"""
+
     cases: list[ReviewCaseModel]
 
 
@@ -175,13 +182,13 @@ async def save_cases(request: SaveCasesRequest):
     try:
         share_id = uuid4().hex
         file_path = SHARED_CASES_DIR / f"{share_id}.json"
-        
+
         # Convert Pydantic models to dict for JSON serialization
         cases_dict = [case.model_dump() for case in request.cases]
-        
+
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(cases_dict, f, ensure_ascii=False, indent=2)
-        
+
         logger.info(f"Saved cases to {file_path}")
         return {"share_id": share_id, "message": "Cases saved successfully"}
     except Exception as e:
@@ -194,13 +201,13 @@ async def get_shared_cases(share_id: str):
     """根據分享 ID 獲取案例數據"""
     try:
         file_path = SHARED_CASES_DIR / f"{share_id}.json"
-        
+
         if not file_path.exists():
             raise HTTPException(status_code=404, detail="Shared case not found")
-        
+
         with open(file_path, "r", encoding="utf-8") as f:
             cases = json.load(f)
-        
+
         logger.info(f"Retrieved shared cases: {share_id}")
         return {"cases": cases}
     except HTTPException:
