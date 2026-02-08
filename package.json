@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite ./frontend",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "build": "tsc -b && vite build ./frontend",
+    "lint": "eslint . --config ./frontend/eslint.config.js",
     "preview": "vite preview",
     "backend": "cd ./backend && fastapi dev"
   },

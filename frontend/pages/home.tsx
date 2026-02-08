@@ -2,9 +2,14 @@ import React, { useState } from "react";
 import config from "../config/constants";
 import { InputGroupIcon } from "../components/input";
 import { AnimatePresence, motion } from "motion/react";
+import { useReviewCases } from "../contexts/ReviewCaseContext";
+import { CaseDetailModal } from "../components/CaseDetailModal";
+import { ShareButton } from "../components/ShareButton";
 
 const Home: React.FC = () => {
   const [tierImages, setTierImages] = useState<Record<string, string[]>>({});
+  const { cases } = useReviewCases();
+  const [selectedCase, setSelectedCase] = useState<string | null>(null);
 
   const handleTierDecided = (tier: string, url: string) => {
     setTierImages((prev) => ({
@@ -13,9 +18,20 @@ const Home: React.FC = () => {
     }));
   };
 
+  const handleImageClick = (imageUrl: string) => {
+    setSelectedCase(imageUrl);
+  };
+
+  const selectedCaseData = cases.find((c) => c.imageUrl === selectedCase);
+
   return (
     <AnimatePresence initial={false}>
       <div className="h-[90%] mx-auto mt-10 w-[90%]">
+        {/* Share Button */}
+        <div className="flex justify-end mb-4">
+          <ShareButton />
+        </div>
+
         <div className="grid grid-cols-1 gap-10 w-full h-full md:grid-cols-3">
           <div className="col-span-1 h-full flex flex-col md:col-span-2">
             {config.tierList.map((label, index) => (
@@ -34,7 +50,10 @@ const Home: React.FC = () => {
                     <motion.div
                       layoutId={url}
                       key={i}
-                      className="h-20 w-20 rounded-md overflow-hidden relative group"
+                      className="h-20 w-20 rounded-md overflow-hidden relative group cursor-pointer"
+                      onClick={() => handleImageClick(url)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                     >
                       <motion.img
                         layoutId={`${url}-img`}
@@ -42,6 +61,7 @@ const Home: React.FC = () => {
                         alt={label}
                         className="w-full h-full object-cover"
                       />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-200" />
                     </motion.div>
                   ))}
                 </div>
@@ -53,6 +73,16 @@ const Home: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Case Detail Modal */}
+      {selectedCase && selectedCaseData && (
+        <CaseDetailModal
+          isOpen={!!selectedCase}
+          onClose={() => setSelectedCase(null)}
+          caseData={selectedCaseData}
+          imageUrl={selectedCase}
+        />
+      )}
     </AnimatePresence>
   );
 };
