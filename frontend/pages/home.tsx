@@ -4,7 +4,6 @@ import { InputGroupIcon } from "../components/input";
 import { AnimatePresence, motion } from "motion/react";
 import { useReviewCases } from "../contexts/ReviewCaseContext";
 import { CaseDetailModal } from "../components/CaseDetailModal";
-import { ShareButton } from "../components/ShareButton";
 
 const Home: React.FC = () => {
   const [tierImages, setTierImages] = useState<Record<string, string[]>>({});
