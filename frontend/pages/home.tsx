@@ -27,11 +27,6 @@ const Home: React.FC = () => {
   return (
     <AnimatePresence initial={false}>
       <div className="h-[90%] mx-auto mt-10 w-[90%]">
-        {/* Share Button */}
-        <div className="flex justify-end mb-4">
-          <ShareButton />
-        </div>
-
         <div className="grid grid-cols-1 gap-10 w-full h-full md:grid-cols-3">
           <div className="col-span-1 h-full flex flex-col md:col-span-2">
             {config.tierList.map((label, index) => (
