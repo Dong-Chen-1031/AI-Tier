@@ -114,13 +114,13 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-button[disabled] {
+/* button[disabled] {
   cursor: not-allowed;
 }
 
 button {
   cursor: pointer;
-}
+} */
 
 @layer base {
   * {

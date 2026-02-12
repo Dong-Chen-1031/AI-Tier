@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-FRONTEND_URL = getenv("FRONTEND_URL", "http://127.0.0.1:3000")
+FRONTEND_URL = getenv("FRONTEND_URL", "https://tier.doong.me/")
 
 API_SERVICE_TIME_OUT = int(getenv("API_SERVICE_TIME_OUT", "300"))
 

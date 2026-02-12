@@ -1,8 +1,10 @@
 from typing import Any, AsyncGenerator, Optional
+from venv import logger
 
 import httpx
 import opencc
 from dotenv import load_dotenv
+from fastapi import HTTPException
 from fishaudio import AsyncFishAudio
 from rich.traceback import install
 from settings import FISH_API_KEY
@@ -53,14 +55,22 @@ def websocket_tts(
     return audio_stream
 
 
-async def get_models(title: str) -> list[dict[str, Any]]:
+async def get_models(
+    title: Optional[str] = None, sort_by: Optional[str] = "score"
+) -> list[dict[str, Any]]:
     async with httpx.AsyncClient() as client:
-        title = t2s(title)
-        url = f"https://api.fish.audio/model?page_size=10&page_number=1&sort_by=score&title={title}"
+        title = t2s(title) if title else ""
+        url = f"https://api.fish.audio/model?page_size=10&page_number=1&sort_by={sort_by}&title_language=zh{f'&title={title}' if title else ''}"
 
         headers = {"Authorization": f"Bearer {FISH_API_KEY}"}
-
-        response = await client.get(url, headers=headers)
+        try:
+            response = await client.get(url, headers=headers, timeout=30)
+        except httpx.ReadTimeout:
+            logger.error("獲取模型列表超時")
+            raise HTTPException(
+                status_code=504,
+                detail="由於我們的爛 Fish Audio 伺服器，獲取模型列表超時",
+            )
         # logger.info(f"獲取模型列表的響應: {response.text}")
         items = response.json().get("items", [])
         for item in items:

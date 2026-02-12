@@ -7,7 +7,7 @@ import settings
 from api import Tts
 from api.img import search_images
 from api.services import ApiService
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -17,14 +17,18 @@ from utils.log import logger
 app = FastAPI()
 
 # 添加 CORS 中間件
+origins = [
+    settings.FRONTEND_URL,
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.FRONTEND_URL],  # 允許前端來源
+    allow_origins=origins,  # 允許前端來源
     allow_credentials=True,  # 允許攜帶 cookies
     allow_methods=["*"],  # 允許所有 HTTP 方法
     allow_headers=["*"],  # 允許所有 headers
 )
-logger.info(f"CORS allow origin: {settings.FRONTEND_URL}")
+logger.info(f"CORS allow origins: {origins}")
 
 # Mount storage directory
 app.mount("/storage", StaticFiles(directory="storage"), name="storage")
@@ -33,6 +37,11 @@ app.mount("/storage", StaticFiles(directory="storage"), name="storage")
 # Create directory for storing shared cases
 SHARED_CASES_DIR = Path("./storage/shared_cases")
 SHARED_CASES_DIR.mkdir(exist_ok=True)
+
+# 文件驗證限制
+MAX_CASES_COUNT = 50  # 最大案例數量
+MAX_FILE_SIZE_MB = 1  # 最大文件大小（MB）
+MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
 
 Tiers = Literal["夯", "頂級", "人上人", "NPC", "拉完了"]
 
@@ -136,10 +145,13 @@ async def chat(chat_input: TierRequest) -> TierResponse:
     return TierResponse(case_id=uuid, img_url=img_url[0] if img_url else "")
 
 
-@app.get("/models/{model_name}")
-async def get_model(model_name: str):
+@app.get("/models")
+async def get_model(model_name: Optional[str] = None, sort_by: Optional[str] = "score"):
     """獲取模型列表"""
-    models = await Tts.get_models(model_name)
+    if not model_name:
+        with open(f"storage/fish_model/{sort_by}.json", "r", encoding="utf-8") as f:
+            models = json.load(f)
+    models = await Tts.get_models(model_name, sort_by)
     return models
 
 
@@ -177,20 +189,44 @@ class SaveCasesRequest(BaseModel):
 
 
 @app.post("/save-cases")
-async def save_cases(request: SaveCasesRequest):
+async def save_cases(request: Request, save_request: SaveCasesRequest):
     """保存所有案例到 JSON 文件"""
     try:
+        body = await request.body()
+        body_size = len(body)
+
+        if body_size > MAX_FILE_SIZE_BYTES:
+            raise HTTPException(
+                status_code=413,
+                detail=f"請求數據過大，最大允許 {MAX_FILE_SIZE_MB}MB，當前為 {body_size / 1024 / 1024:.2f}MB",
+            )
+
+        if len(save_request.cases) == 0:
+            raise HTTPException(status_code=400, detail="至少需要一個案例 Case")
+
+        if len(save_request.cases) > MAX_CASES_COUNT:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Case 數量超過限制，最多允許 {MAX_CASES_COUNT} 個案例",
+            )
+
         share_id = uuid4().hex
         file_path = SHARED_CASES_DIR / f"{share_id}.json"
 
         # Convert Pydantic models to dict for JSON serialization
-        cases_dict = [case.model_dump() for case in request.cases]
+        cases_dict = [case.model_dump() for case in save_request.cases]
 
+        # 寫入文件（使用與原始數據相同的格式）
+        json_str = json.dumps(cases_dict, ensure_ascii=False, indent=2)
         with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(cases_dict, f, ensure_ascii=False, indent=2)
+            f.write(json_str)
 
-        logger.info(f"Saved cases to {file_path}")
+        logger.info(
+            f"Saved cases to {file_path}, size: {body_size / 1024:.2f}KB, cases count: {len(save_request.cases)}"
+        )
         return {"share_id": share_id, "message": "Cases saved successfully"}
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Failed to save cases: {e}")
         raise HTTPException(status_code=500, detail=str(e))

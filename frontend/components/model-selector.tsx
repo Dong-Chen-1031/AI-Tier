@@ -5,6 +5,7 @@ import { useState, useRef } from "react";
 import config from "@/config/constants";
 import axios from "axios";
 import { cn } from "@/lib/utils";
+import pre_load_models from "@/assets/fish_model/score.json"; // Default import to ensure the file is included in the bundle, but we will fetch actual data from API on search.
 
 interface Model {
   _id: string;
@@ -27,7 +28,7 @@ interface ModelSelectorProps {
 export const ModelSelector = ({ value, onSelect }: ModelSelectorProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [models, setModels] = useState<Model[]>([]);
+  const [models, setModels] = useState<Model[]>(pre_load_models); // Initialize with default models
   const [loading, setLoading] = useState(false);
   const [playingUrl, setPlayingUrl] = useState<string | null>(null);
   const [modelName, setModelName] = useState<string>("");

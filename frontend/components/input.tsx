@@ -353,11 +353,7 @@ export const InputGroupIcon = ({
                       <SelectContent position="popper" className="select-none">
                         <SelectGroup>
                           <SelectLabel>模型</SelectLabel>
-                          <SelectItem value="gpt4">gpt-4</SelectItem>
-                          <SelectItem value="banana">Banana</SelectItem>
-                          <SelectItem value="blueberry">Blueberry</SelectItem>
-                          <SelectItem value="grapes">Grapes</SelectItem>
-                          <SelectItem value="pineapple">Pineapple</SelectItem>
+                          <SelectItem value="gpt4">arcee-ai</SelectItem>
                         </SelectGroup>
                       </SelectContent>
                     </Select>

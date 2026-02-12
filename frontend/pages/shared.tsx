@@ -18,7 +18,7 @@ const SharedView: React.FC = () => {
     const fetchSharedCases = async () => {
       try {
         const response = await axios.get(
-          `${config.api_endpoints}/share/${shareId}`
+          `${config.api_endpoints}/share/${shareId}`,
         );
         setCases(response.data.cases);
       } catch (err) {
@@ -71,9 +71,7 @@ const SharedView: React.FC = () => {
     <div className="h-screen mx-auto mt-10 w-[90%] pb-10">
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold text-primary mb-2">分享的銳評結果</h1>
-        <p className="text-muted-foreground">
-          共 {cases.length} 個案例
-        </p>
+        <p className="text-muted-foreground">共 {cases.length} 個案例</p>
       </div>
 
       <div className="space-y-5">
@@ -96,6 +94,7 @@ const SharedView: React.FC = () => {
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: i * 0.05 }}
+                  layoutId={caseData.imageUrl}
                 >
                   <img
                     src={caseData.imageUrl}

@@ -1,7 +1,10 @@
-python-dotenvrequests>=2.31.0
-pytz>=2023.3
+python-dotenv
+requests
+pytz
 openrouter
 objprint
 fastapi[standard]
 fish-audio-sdk
 rich
+opencc-python-reimplemented
+aiofilesd
