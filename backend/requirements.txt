@@ -7,4 +7,4 @@ fastapi[standard]
 fish-audio-sdk
 rich
 opencc-python-reimplemented
-aiofilesd
+aiofiles
