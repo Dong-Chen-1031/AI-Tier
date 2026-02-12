@@ -1,14 +1,14 @@
 import asyncio
 from collections import OrderedDict
 from re import sub
-from typing import Any, AsyncGenerator, Literal, Optional, TypeVar
+from typing import Any, AsyncGenerator, Optional, TypeVar
 from uuid import uuid4
 
 import aiofiles
 from api import ai
 from api import tts as Tts
 from fastapi import HTTPException
-from settings import API_SERVICE_TIME_OUT
+from settings import API_SERVICE_TIME_OUT, LLMs, LLMs_list
 from utils.log import logger
 
 NO_VOICE = r"\[夯\]|\[頂級\]|\[人上人\]|\[NPC\]|\[拉完了\]"
@@ -33,16 +33,6 @@ class Broadcaster:
             queue.put_nowait(None)
 
 
-LLMs = Literal[
-    "google/gemini-2.5-flash",
-    "google/gemini-2-flash",
-    "google/gemini-2-flash-lite",
-    "google/gemini-2.5-flash-lite",
-    "google/gemini-3-flash",
-    "arcee-ai/trinity-large-preview:free",
-]
-
-
 class ApiService:
     all_services: OrderedDict[str, "ApiService"] = OrderedDict()
     auto_cleanup_task_started = False
@@ -50,7 +40,7 @@ class ApiService:
     def __init__(
         self,
         prompt: str,
-        llm_model: LLMs = "google/gemini-2.5-flash",
+        llm_model: LLMs = LLMs_list[0],
         case_id: Optional[str] = None,
         tts_model: Optional[str] = None,
         tts: bool = True,

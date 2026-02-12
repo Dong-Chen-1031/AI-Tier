@@ -4,7 +4,7 @@ from typing import Any, AsyncGenerator, Optional
 from dotenv import load_dotenv
 from openrouter import OpenRouter
 from pydantic import BaseModel
-from settings import AI_API_KEY
+from settings import AI_API_KEY, LLMs
 
 load_dotenv()
 
@@ -18,7 +18,7 @@ async def stream_messages(
     messages: str, model: Optional[str] = None
 ) -> AsyncGenerator[str, Any]:
     if not model:
-        model = "arcee-ai/trinity-large-preview:free"
+        model = LLMs.__args__[0]
     async with OpenRouter(api_key=AI_API_KEY) as client:
         response = await client.chat.send_async(
             model=model,

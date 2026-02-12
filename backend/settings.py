@@ -1,4 +1,5 @@
 from os import getenv
+from typing import Literal, get_args
 
 from dotenv import load_dotenv
 
@@ -15,3 +16,14 @@ AI_API_KEY = getenv("AI_API_KEY", "")
 IMG_API_KEY = getenv("IMG_API_KEY", "")
 
 DEV_MODE = getenv("APP_MODE", "production") == "dev"
+
+LLMs = Literal[
+    "google/gemini-2.5-flash",
+    "google/gemini-2-flash",
+    "google/gemini-2-flash-lite",
+    "google/gemini-2.5-flash-lite",
+    "google/gemini-3-flash",
+    "arcee-ai/trinity-large-preview:free",
+]
+
+LLMs_list = list(get_args(LLMs))

@@ -50,13 +50,13 @@ export interface TierRequest {
   subject: string; //V
   role_name?: string; //V
   role_description?: string | false; //V
-  tier?: string;
+  tier?: string; //V
   suggestion?: string | null; //V
   tts?: boolean | null; //V
   tts_model?: string | null; //V
   tts_speed?: number | null; //V
   llm_model?: string | null; //V
-  style?: string | null;
+  style?: string | null; //V
 }
 
 export const InputGroupIcon = ({
@@ -188,7 +188,7 @@ export const InputGroupIcon = ({
         role_description: "",
         suggestion: "",
         tier: config.tierList[0],
-        llm_model: "gpt4",
+        llm_model: config.LLMs[0],
         style: "不指定",
         tts_model: "",
         tts_speed: 1,
@@ -347,8 +347,7 @@ export const InputGroupIcon = ({
                   render={({ field }) => (
                     <Select
                       onValueChange={field.onChange}
-                      value={config.LLMs[0]}
-                      {...register("llm_model")}
+                      value={field.value ?? undefined}
                     >
                       <SelectTrigger className="w-full max-w-48 select-none">
                         <SelectValue />
