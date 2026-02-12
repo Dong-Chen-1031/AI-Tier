@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite ./frontend",
+    "frontend": "vite ./frontend",
     "build": "tsc -b && vite build ./frontend",
     "lint": "eslint . --config ./frontend/eslint.config.js",
+    "dev": "concurrently \"bun run frontend\" \"bun run backend\"",
     "preview": "vite preview",
     "backend": "cd ./backend && fastapi dev"
   },

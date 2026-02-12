@@ -10,6 +10,14 @@ export const config = {
   colorList: colorList,
   tierMap: tierMap,
   // API 端點
+  LLMs: [
+    "google/gemini-2.5-flash",
+    "google/gemini-2-flash",
+    "google/gemini-2-flash-lite",
+    "google/gemini-2.5-flash-lite",
+    "google/gemini-3-flash",
+    "arcee-ai/trinity-large-preview:free",
+  ],
   api_endpoints: import.meta.env.VITE_API_ENDPOINT || "http://127.0.0.1:5000",
 } as const;
 export default config;

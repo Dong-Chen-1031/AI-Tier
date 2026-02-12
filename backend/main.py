@@ -6,7 +6,7 @@ from uuid import uuid4
 import settings
 from api import tts as Tts
 from api.img import search_images
-from api.services import ApiService
+from api.services import ApiService, LLMs
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
@@ -69,7 +69,7 @@ class TierRequest(BaseModel):
     tts: Optional[bool] = None
     tts_model: Optional[str] = None
     tts_speed: float = 1.0
-    llm_model: str = "arcee-ai/trinity-large-preview:free"
+    llm_model: LLMs = "google/gemini-2.5-flash"
     style: Optional[str] = None
 
     def __repr__(self):
@@ -108,7 +108,7 @@ class TierRequest(BaseModel):
             f"你今天要銳評的東西是 「{self.subject}」{if_exists('使用者已設定他的評級為「{}」，請按照使用者的設定來完成銳評，你必須按照使用者的要求，自然的說出理由，最後將其評為使用者指定內容', self.tier)}\n"
             f"{if_exists('使用者請求你以「{}」的風格來進行銳評。希望你能參考其建議來進行。\n', self.style)}"
             f"{if_exists('以下是一些使用者而額外的請求：{}。\n', self.suggestion)}"
-            f"現在請開始你的銳評吧！相信你可做到的！"
+            f"現在請開始你的銳評吧！請遵守上方的規範，相信你可做到的！"
         )
         return prompt
 
@@ -146,6 +146,7 @@ async def chat(chat_input: TierRequest) -> TierResponse:
 
     ApiService(
         prompt=chat_input.to_prompt(),
+        llm_model=chat_input.llm_model,
         case_id=uuid,
         tts_model=chat_input.tts_model,
         tts_speed=chat_input.tts_speed,

@@ -1,7 +1,7 @@
 import asyncio
 from collections import OrderedDict
 from re import sub
-from typing import Any, AsyncGenerator, Optional, TypeVar
+from typing import Any, AsyncGenerator, Literal, Optional, TypeVar
 from uuid import uuid4
 
 import aiofiles
@@ -33,6 +33,16 @@ class Broadcaster:
             queue.put_nowait(None)
 
 
+LLMs = Literal[
+    "google/gemini-2.5-flash",
+    "google/gemini-2-flash",
+    "google/gemini-2-flash-lite",
+    "google/gemini-2.5-flash-lite",
+    "google/gemini-3-flash",
+    "arcee-ai/trinity-large-preview:free",
+]
+
+
 class ApiService:
     all_services: OrderedDict[str, "ApiService"] = OrderedDict()
     auto_cleanup_task_started = False
@@ -40,7 +50,7 @@ class ApiService:
     def __init__(
         self,
         prompt: str,
-        llm_model: Optional[str] = "arcee-ai/trinity-large-preview:free",
+        llm_model: LLMs = "google/gemini-2.5-flash",
         case_id: Optional[str] = None,
         tts_model: Optional[str] = None,
         tts: bool = True,

@@ -347,7 +347,8 @@ export const InputGroupIcon = ({
                   render={({ field }) => (
                     <Select
                       onValueChange={field.onChange}
-                      value={field.value ?? undefined}
+                      value={config.LLMs[0]}
+                      {...register("llm_model")}
                     >
                       <SelectTrigger className="w-full max-w-48 select-none">
                         <SelectValue />
@@ -355,7 +356,15 @@ export const InputGroupIcon = ({
                       <SelectContent position="popper" className="select-none">
                         <SelectGroup>
                           <SelectLabel>模型</SelectLabel>
-                          <SelectItem value="gpt4">arcee-ai</SelectItem>
+                          {config.LLMs.map((model) => (
+                            <SelectItem
+                              key={model}
+                              value={model}
+                              className="cursor-pointer"
+                            >
+                              {model.split("/")[1]}
+                            </SelectItem>
+                          ))}
                         </SelectGroup>
                       </SelectContent>
                     </Select>
