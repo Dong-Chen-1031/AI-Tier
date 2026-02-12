@@ -3,7 +3,7 @@ import json
 import pathlib
 import shutil
 
-from api.Tts import get_models
+from api.tts import get_models
 from utils.log import logger
 
 

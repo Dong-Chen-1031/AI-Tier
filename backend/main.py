@@ -4,7 +4,7 @@ from typing import Literal, Optional
 from uuid import uuid4
 
 import settings
-from api import Tts
+from api import tts as Tts
 from api.img import search_images
 from api.services import ApiService
 from fastapi import FastAPI, HTTPException, Request
