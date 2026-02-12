@@ -5,7 +5,8 @@ from typing import Any, AsyncGenerator, Optional, TypeVar
 from uuid import uuid4
 
 import aiofiles
-from api import Tts, ai
+from api import ai
+from api import tts as Tts
 from fastapi import HTTPException
 from settings import API_SERVICE_TIME_OUT
 from utils.log import logger
