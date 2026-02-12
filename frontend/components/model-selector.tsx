@@ -39,7 +39,7 @@ export const ModelSelector = ({ value, onSelect }: ModelSelectorProps) => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `${config.api_endpoints}/models/${query}`,
+        `${config.api_endpoints}/models?model_name=${encodeURIComponent(query)}`,
       );
       // The backend returns the list of items directly based on code analysis
       // But let's handle if it returns { items: [...] } just in case, though code says list.
