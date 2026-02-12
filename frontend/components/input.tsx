@@ -77,6 +77,7 @@ export const InputGroupIcon = ({
     url: string;
   } | null>(null);
   const [audioFinished, setAudioFinished] = useState(false);
+  const [msgFinished, setMsgFinished] = useState(false);
   const { addCase, updateCase } = useReviewCases();
 
   // Reset state when starting new
@@ -88,11 +89,11 @@ export const InputGroupIcon = ({
   };
 
   useEffect(() => {
-    if (pendingDecision && audioFinished && onDecided && !hasMoved) {
+    if (pendingDecision && onDecided && !hasMoved && msgFinished) {
       setHasMoved(true);
       onDecided(pendingDecision.tier, pendingDecision.url);
     }
-  }, [pendingDecision, audioFinished, onDecided, hasMoved]);
+  }, [pendingDecision, onDecided, hasMoved, msgFinished]);
 
   const playAudio = async (case_id: string) => {
     if (audioRef.current) {
@@ -119,7 +120,10 @@ export const InputGroupIcon = ({
 
     while (true) {
       const { value, done } = await reader.read();
-      if (done) break;
+      if (done) {
+        setMsgFinished(true);
+        break;
+      }
 
       const chunk = decoder.decode(value, { stream: true });
       fullText += chunk;
@@ -150,10 +154,8 @@ export const InputGroupIcon = ({
     const case_id = response.data.case_id;
     const img_url = response.data.img_url;
 
-    // Set ImgUrl state for local display until it moves
     setImgUrl(img_url);
 
-    // Add case to global state
     addCase({
       caseId: case_id,
       imageUrl: img_url,
@@ -406,9 +408,9 @@ export const InputGroupIcon = ({
                     />
                   )}
                 />
-                <FieldDescription className="text-primary/50 text-left text-xs ml-1">
+                {/* <FieldDescription className="text-primary/50 text-left text-xs ml-1">
                   可直接搜尋並試聽選擇語音模型
-                </FieldDescription>
+                </FieldDescription> */}
               </Field>
 
               <Field orientation="horizontal" className="pl-1">

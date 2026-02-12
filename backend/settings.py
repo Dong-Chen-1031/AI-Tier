@@ -13,3 +13,5 @@ FISH_API_KEY = getenv("FISH_API_KEY", "")
 AI_API_KEY = getenv("AI_API_KEY", "")
 
 IMG_API_KEY = getenv("IMG_API_KEY", "")
+
+DEV_MODE = getenv("APP_MODE", "production") == "dev"

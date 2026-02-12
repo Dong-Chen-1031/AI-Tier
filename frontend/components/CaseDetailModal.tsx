@@ -60,7 +60,7 @@ export const CaseDetailModal: React.FC<CaseDetailModalProps> = ({
               {/* Close button */}
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 p-2 rounded-full hover:bg-accent transition-colors z-10"
+                className="absolute top-4 right-4 p-2 rounded-full hover:bg-accent transition-colors z-10 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -82,30 +82,29 @@ export const CaseDetailModal: React.FC<CaseDetailModalProps> = ({
 
                 {/* Case Details */}
                 <div className="space-y-4">
-                  <div>
-                    <h2 className="text-2xl font-bold text-primary mb-2">
+                  <div className="flex gap-2 justify-start items-center">
+                    {caseData.tierDecision && (
+                      <div
+                        className="m-1 px-2 flex items-center justify-center rounded-2xl w-fit"
+                        style={{
+                          backgroundColor:
+                            config.tierMap[caseData.tierDecision] || "white",
+                        }}
+                      >
+                        <p className="text-sm font-medium text-black">
+                          {caseData.tierDecision}
+                        </p>
+                      </div>
+                    )}
+                    <h2 className="text-2xl font-bold text-primary">
                       {caseData.formData.subject}
                     </h2>
-                    <p className="text-sm text-muted-foreground">
-                      案例 ID: {caseData.caseId}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      時間: {formattedDate}
-                    </p>
                   </div>
 
-                  {caseData.tierDecision && (
-                    <div className="bg-accent/20 p-3 rounded-md">
-                      <p className="text-sm font-medium text-primary">
-                        評級: {caseData.tierDecision}
-                      </p>
-                    </div>
-                  )}
-
                   {caseData.reply && (
-                    <div className="bg-accent/10 p-4 rounded-md">
-                      <h3 className="text-sm font-semibold text-primary mb-2">
-                        銳評內容
+                    <div className="bg-accent/10 pl-1 rounded-md">
+                      <h3 className="text-lg font-semibold text-primary mb-2">
+                        銳評內容：
                       </h3>
                       <p className="text-foreground mb-4">{caseData.reply}</p>
                       {caseData.formData.tts && (
@@ -121,8 +120,8 @@ export const CaseDetailModal: React.FC<CaseDetailModalProps> = ({
                   )}
 
                   {/* Form Data */}
-                  <div className="border-t border-border pt-4">
-                    <h3 className="text-sm font-semibold text-primary mb-3">
+                  <div className="border-t border-border p-2">
+                    <h3 className="text-lg font-semibold text-primary mb-3">
                       表單資訊
                     </h3>
                     <div className="space-y-2 text-sm">

@@ -6,6 +6,7 @@ import type { ReviewCase } from "../contexts/ReviewCaseContext";
 import { motion } from "motion/react";
 import Loader from "../components/loader";
 import { CaseDetailModal } from "../components/CaseDetailModal";
+import { Button } from "@/components/ui/button";
 
 const SharedView: React.FC = () => {
   const { shareId } = useParams<{ shareId: string }>();
@@ -46,8 +47,11 @@ const SharedView: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-red-500 mb-4">錯誤</h2>
+          <h2 className="text-2xl font-bold text-red-700 mb-4">錯誤</h2>
           <p className="text-muted-foreground">{error}</p>
+          <a href="/" className="inline-block mt-6">
+            <Button>建立你的銳評</Button>
+          </a>
         </div>
       </div>
     );
@@ -68,10 +72,18 @@ const SharedView: React.FC = () => {
   const colorList = ["#F00", "#FFBF00", "#FF0", "#FFF2CC", "#FFF"];
 
   return (
-    <div className="h-screen mx-auto mt-10 w-[90%] pb-10">
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-primary mb-2">分享的銳評結果</h1>
-        <p className="text-muted-foreground">共 {cases.length} 個案例</p>
+    <div className="h-[90%] mt-8 mx-auto w-[90%] pb-10">
+      <div className="mb-8 text-center flex justify-between items-center">
+        <div className="w-32"></div>
+        <div>
+          <h1 className="text-3xl font-bold text-primary mb-2">
+            分享的銳評結果
+          </h1>
+          {/* <p className="text-muted-foreground">共 {cases.length} 個 Case</p> */}
+        </div>
+        <a href="/" className="inline-block">
+          <Button>建立你的銳評</Button>
+        </a>
       </div>
 
       <div className="space-y-5">
@@ -96,7 +108,8 @@ const SharedView: React.FC = () => {
                   transition={{ delay: i * 0.05 }}
                   layoutId={caseData.imageUrl}
                 >
-                  <img
+                  <motion.img
+                    layoutId={`${caseData.imageUrl}-img`}
                     src={caseData.imageUrl}
                     alt={caseData.formData.subject}
                     className="w-full h-full object-cover"

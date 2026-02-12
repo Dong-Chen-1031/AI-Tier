@@ -25,7 +25,7 @@ const Home: React.FC = () => {
 
   return (
     <AnimatePresence initial={false}>
-      <div className="h-[90%] mx-auto mt-10 w-[90%]">
+      <div className="h-[90%] mx-auto mt-[5%] w-[90%]">
         <div className="grid grid-cols-1 gap-10 w-full md:grid-cols-3">
           <div className="col-span-1 flex flex-col md:col-span-2">
             {config.tierList.map((label, index) => (

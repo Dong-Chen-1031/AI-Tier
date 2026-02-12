@@ -9,12 +9,22 @@ from api.img import search_images
 from api.services import ApiService
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from settings import DEV_MODE
 from starlette.responses import StreamingResponse
 from utils.log import logger
 
-app = FastAPI()
+docs_url = "/docs" if DEV_MODE else None  # disables docs
+redoc_url = "/redoc" if DEV_MODE else None  # disables redoc
+openapi_url = "/openapi.json" if DEV_MODE else None
+app = FastAPI(
+    debug=settings.DEV_MODE,
+    docs_url=docs_url,
+    redoc_url=redoc_url,
+    openapi_url=openapi_url,
+)
 
 # 添加 CORS 中間件
 origins = [
@@ -106,6 +116,11 @@ class TierRequest(BaseModel):
 class TierResponse(BaseModel):
     case_id: str
     img_url: str
+
+
+@app.get("/")
+def root():
+    return RedirectResponse(settings.FRONTEND_URL)
 
 
 @app.get("/tts/{case_id}")
