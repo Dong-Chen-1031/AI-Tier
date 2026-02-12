@@ -69,14 +69,12 @@ const Home: React.FC = () => {
       </div>
 
       {/* Case Detail Modal */}
-      {selectedCase && selectedCaseData && (
-        <CaseDetailModal
-          isOpen={!!selectedCase}
-          onClose={() => setSelectedCase(null)}
-          caseData={selectedCaseData}
-          imageUrl={selectedCase}
-        />
-      )}
+      <CaseDetailModal
+        isOpen={!!selectedCase && !!selectedCaseData}
+        onClose={() => setSelectedCase(null)}
+        caseData={selectedCaseData}
+        imageUrl={selectedCase}
+      />
     </AnimatePresence>
   );
 };

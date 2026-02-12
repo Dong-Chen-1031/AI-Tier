@@ -123,14 +123,12 @@ const SharedView: React.FC = () => {
       </div>
 
       {/* Case Detail Modal */}
-      {selectedCase && (
-        <CaseDetailModal
-          isOpen={!!selectedCase}
-          onClose={() => setSelectedCase(null)}
-          caseData={selectedCase}
-          imageUrl={selectedCase.imageUrl}
-        />
-      )}
+      <CaseDetailModal
+        isOpen={!!selectedCase}
+        onClose={() => setSelectedCase(null)}
+        caseData={selectedCase}
+        imageUrl={selectedCase?.imageUrl}
+      />
     </div>
   );
 };

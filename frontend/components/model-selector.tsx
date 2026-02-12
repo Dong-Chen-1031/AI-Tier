@@ -110,24 +110,21 @@ export const ModelSelector = ({ value, onSelect }: ModelSelectorProps) => {
                 onClick={() => setIsOpen(false)}
               />
               <motion.div
-                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                initial={{ opacity: 0, scale: 0.7, y: 20 }}
                 animate={{
                   opacity: 1,
                   scale: 1,
                   y: 0,
-                  transition: {
-                    duration: 0.2,
-                    ease: "easeOut",
-                  },
                 }}
                 exit={{
                   opacity: 0,
-                  scale: 0.95,
+                  scale: 0.7,
                   y: 10,
-                  transition: {
-                    duration: 0.2,
-                    ease: "easeIn",
-                  },
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 260,
+                  damping: 20,
                 }}
                 className="relative z-50 w-fit h-fit max-w-2xl gap-4 border bg-background p-6 shadow-lg rounded-lg max-h-[85vh] flex flex-col"
               >

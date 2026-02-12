@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X } from "lucide-react";
 import type { ReviewCase } from "../contexts/ReviewCaseContext";
@@ -7,8 +7,8 @@ import config from "../config/constants";
 interface CaseDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
-  caseData: ReviewCase;
-  imageUrl: string;
+  caseData?: ReviewCase | null;
+  imageUrl?: string | null;
 }
 
 export const CaseDetailModal: React.FC<CaseDetailModalProps> = ({
@@ -17,28 +17,29 @@ export const CaseDetailModal: React.FC<CaseDetailModalProps> = ({
   caseData,
   imageUrl,
 }) => {
-  if (!isOpen) return null;
+  // Cache last valid props for exit animation
+  const lastCaseData = useRef<ReviewCase | null>(null);
+  const lastImageUrl = useRef<string>("");
 
-  const formattedDate = new Date(caseData.timestamp).toLocaleString("zh-TW", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  });
+  if (caseData) lastCaseData.current = caseData;
+  if (imageUrl) lastImageUrl.current = imageUrl;
+
+  const displayData = caseData ?? lastCaseData.current;
+  const displayImageUrl = imageUrl ?? lastImageUrl.current;
+
+  if (!displayData) return null;
 
   return (
     <AnimatePresence>
       {isOpen && (
-        <>
+        <div className="fixed inset-0 flex items-center justify-center p-4">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-10"
           />
 
           {/* Modal */}
@@ -51,10 +52,10 @@ export const CaseDetailModal: React.FC<CaseDetailModalProps> = ({
               stiffness: 260,
               damping: 20,
             }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            className="z-20"
           >
             <div
-              className="bg-card rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative"
+              className="bg-card rounded-lg shadow-xl max-w-2xl w-fit max-h-[90vh] overflow-y-auto relative"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close button */}
@@ -69,49 +70,51 @@ export const CaseDetailModal: React.FC<CaseDetailModalProps> = ({
               <div className="p-6">
                 {/* Image */}
                 <motion.div
-                  layoutId={imageUrl}
-                  className="w-full aspect-square rounded-lg overflow-hidden mb-4"
+                  layoutId={displayImageUrl}
+                  className="w-full aspect-square rounded-lg overflow-hidden mb-4 z-30"
                 >
                   <motion.img
-                    layoutId={`${imageUrl}-img`}
-                    src={imageUrl}
-                    alt={caseData.formData.subject}
-                    className="w-full h-full object-cover"
+                    layoutId={`${displayImageUrl}-img`}
+                    src={displayImageUrl}
+                    alt={displayData.formData.subject}
+                    className="w-full h-full object-cover "
                   />
                 </motion.div>
 
                 {/* Case Details */}
                 <div className="space-y-4">
                   <div className="flex gap-2 justify-start items-center">
-                    {caseData.tierDecision && (
+                    {displayData.tierDecision && (
                       <div
                         className="m-1 px-2 flex items-center justify-center rounded-2xl w-fit"
                         style={{
                           backgroundColor:
-                            config.tierMap[caseData.tierDecision] || "white",
+                            config.tierMap[displayData.tierDecision] || "white",
                         }}
                       >
                         <p className="text-sm font-medium text-black">
-                          {caseData.tierDecision}
+                          {displayData.tierDecision}
                         </p>
                       </div>
                     )}
                     <h2 className="text-2xl font-bold text-primary">
-                      {caseData.formData.subject}
+                      {displayData.formData.subject}
                     </h2>
                   </div>
 
-                  {caseData.reply && (
+                  {displayData.reply && (
                     <div className="bg-accent/10 pl-1 rounded-md">
                       <h3 className="text-lg font-semibold text-primary mb-2">
                         銳評內容：
                       </h3>
-                      <p className="text-foreground mb-4">{caseData.reply}</p>
-                      {caseData.formData.tts && (
+                      <p className="text-foreground mb-4">
+                        {displayData.reply}
+                      </p>
+                      {displayData.formData.tts && (
                         <audio
                           controls
                           className="w-full mt-2"
-                          src={`${config.api_endpoints}/storage/audio/${caseData.caseId}.mp3`}
+                          src={`${config.api_endpoints}/storage/audio/${displayData.caseId}.mp3`}
                         >
                           您的瀏覽器不支援音訊元素。
                         </audio>
@@ -125,47 +128,47 @@ export const CaseDetailModal: React.FC<CaseDetailModalProps> = ({
                       表單資訊
                     </h3>
                     <div className="space-y-2 text-sm">
-                      {caseData.formData.role_name && (
+                      {displayData.formData.role_name && (
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">銳評者:</span>
                           <span className="text-foreground">
-                            {caseData.formData.role_name}
+                            {displayData.formData.role_name}
                           </span>
                         </div>
                       )}
-                      {caseData.formData.role_description && (
+                      {displayData.formData.role_description && (
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">
                             角色描述:
                           </span>
                           <span className="text-foreground">
-                            {caseData.formData.role_description}
+                            {displayData.formData.role_description}
                           </span>
                         </div>
                       )}
-                      {caseData.formData.style && (
+                      {displayData.formData.style && (
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">風格:</span>
                           <span className="text-foreground">
-                            {caseData.formData.style}
+                            {displayData.formData.style}
                           </span>
                         </div>
                       )}
-                      {caseData.formData.llm_model && (
+                      {displayData.formData.llm_model && (
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">模型:</span>
                           <span className="text-foreground">
-                            {caseData.formData.llm_model}
+                            {displayData.formData.llm_model.split("/")[1]}
                           </span>
                         </div>
                       )}
-                      {caseData.formData.suggestion && (
+                      {displayData.formData.suggestion && (
                         <div className="mt-2">
                           <span className="text-muted-foreground block mb-1">
                             其他建議:
                           </span>
                           <span className="text-foreground">
-                            {caseData.formData.suggestion}
+                            {displayData.formData.suggestion}
                           </span>
                         </div>
                       )}
@@ -175,7 +178,7 @@ export const CaseDetailModal: React.FC<CaseDetailModalProps> = ({
               </div>
             </div>
           </motion.div>
-        </>
+        </div>
       )}
     </AnimatePresence>
   );
