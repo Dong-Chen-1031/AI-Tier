@@ -76,8 +76,12 @@ export const InputGroupIcon = ({
     tier: string;
     url: string;
   } | null>(null);
+
+  // For image move
   const [audioFinished, setAudioFinished] = useState(false);
   const [msgFinished, setMsgFinished] = useState(false);
+  const [isTimeToMove, setIsTimeToMove] = useState(false);
+
   const { addCase, updateCase } = useReviewCases();
 
   // Reset state when starting new
@@ -89,11 +93,17 @@ export const InputGroupIcon = ({
   };
 
   useEffect(() => {
-    if (pendingDecision && onDecided && !hasMoved && msgFinished) {
+    if (
+      pendingDecision &&
+      onDecided &&
+      !hasMoved &&
+      msgFinished &&
+      isTimeToMove
+    ) {
       setHasMoved(true);
       onDecided(pendingDecision.tier, pendingDecision.url);
     }
-  }, [pendingDecision, onDecided, hasMoved, msgFinished]);
+  }, [pendingDecision, onDecided, hasMoved, msgFinished, isTimeToMove]);
 
   const playAudio = async (case_id: string) => {
     if (audioRef.current) {
@@ -174,7 +184,9 @@ export const InputGroupIcon = ({
       streamingText: "",
       reply: "",
     });
-
+    setTimeout(() => {
+      setIsTimeToMove(true);
+    }, 5000);
     playAudio(case_id);
     streamText(case_id, img_url);
     return img_url;
