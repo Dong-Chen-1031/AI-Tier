@@ -1,7 +1,7 @@
 {
   "name": "AI 銳評產生器",
   "short_name": "AI銳評",
-  "description": "AI 銳評產生器！自動產生從「從夯到拉」銳評，可自訂語音、銳評者。免費使用，支援分享結果。",
+  "description": "AI 銳評產生器！自動產生從「從夯到拉」銳評，可自訂 AI 語音、銳評者。免費使用，支援分享結果。",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import config from "../config/constants";
 import type { ReviewCase } from "../contexts/ReviewCaseContext";
@@ -56,9 +56,9 @@ const SharedView: React.FC = () => {
         <div className="text-center">
           <h2 className="text-2xl font-bold text-red-700 mb-4">錯誤</h2>
           <p className="text-muted-foreground">{error}</p>
-          <a href="/" className="inline-block mt-6">
+          <Link to="/" className="inline-block mt-6">
             <Button>建立你的銳評</Button>
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -88,9 +88,9 @@ const SharedView: React.FC = () => {
           </h1>
           {/* <p className="text-muted-foreground">共 {cases.length} 個 Case</p> */}
         </div>
-        <a href="/" className="inline-block">
+        <Link to="/" className="inline-block">
           <Button>建立你的銳評</Button>
-        </a>
+        </Link>
       </header>
 
       <main className="space-y-5">
