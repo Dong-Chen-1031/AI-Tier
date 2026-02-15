@@ -65,7 +65,7 @@ async def get_models(
         headers = {"Authorization": f"Bearer {FISH_API_KEY}"}
         try:
             response = await client.get(url, headers=headers, timeout=30)
-        except httpx.ReadTimeout:
+        except httpx.TimeoutException:
             logger.error("獲取模型列表超時")
             raise HTTPException(
                 status_code=504,

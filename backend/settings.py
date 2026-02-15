@@ -23,7 +23,11 @@ LLMs = Literal[
     "google/gemini-2-flash-lite",
     "google/gemini-2.5-flash-lite",
     "google/gemini-3-flash",
-    "arcee-ai/trinity-large-preview:free",
 ]
 
 LLMs_list = list(get_args(LLMs))
+
+
+LLMs_to_api = {
+    model: model.replace("google", "google-ai-studio") for model in LLMs_list
+}
