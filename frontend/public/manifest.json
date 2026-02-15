@@ -1,0 +1,17 @@
+{
+  "name": "AI 銳評產生器",
+  "short_name": "AI銳評",
+  "description": "上傳圖片，讓 AI 幫你銳評打分！自動產生 Tier List 排名。",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "lang": "zh-TW",
+  "icons": [
+    {
+      "src": "/assets/icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}

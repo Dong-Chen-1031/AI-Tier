@@ -13,6 +13,17 @@ export default defineConfig({
     }),
     tailwindcss(),
   ],
+  publicDir: "public",
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          router: ["react-router-dom"],
+          animation: ["motion"],
+        },
+      },
+    },
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./"),

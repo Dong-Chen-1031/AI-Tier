@@ -16,6 +16,13 @@ const SharedView: React.FC = () => {
   const [selectedCase, setSelectedCase] = useState<ReviewCase | null>(null);
 
   useEffect(() => {
+    document.title = "分享的銳評結果 — AI 銳評產生器";
+    return () => {
+      document.title = "AI 銳評產生器 — 用 AI 幫你的圖片做 Tier List 排名";
+    };
+  }, []);
+
+  useEffect(() => {
     const fetchSharedCases = async () => {
       try {
         const response = await axios.get(
@@ -73,7 +80,7 @@ const SharedView: React.FC = () => {
 
   return (
     <div className="h-[90%] mt-8 mx-auto w-[90%] pb-10">
-      <div className="mb-8 text-center flex justify-between items-center">
+      <header className="mb-8 text-center flex justify-between items-center">
         <div className="w-32"></div>
         <div>
           <h1 className="text-3xl font-bold text-primary mb-2">
@@ -84,9 +91,9 @@ const SharedView: React.FC = () => {
         <a href="/" className="inline-block">
           <Button>建立你的銳評</Button>
         </a>
-      </div>
+      </header>
 
-      <div className="space-y-5">
+      <main className="space-y-5">
         {tierList.map((label, index) => (
           <div key={index} className="flex text-center">
             <div
@@ -120,7 +127,7 @@ const SharedView: React.FC = () => {
             </div>
           </div>
         ))}
-      </div>
+      </main>
 
       {/* Case Detail Modal */}
       <CaseDetailModal

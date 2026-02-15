@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Loader from "./components/loader";
 import Home from "./pages/home";
 import SharedView from "./pages/shared";
+import NotFound from "./pages/not-found";
 import { ThemeProvider } from "./components/theme-provider";
 import { ReviewCaseProvider } from "./contexts/ReviewCaseContext";
 
@@ -21,6 +22,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/share/:shareId" element={<SharedView />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
         </BrowserRouter>

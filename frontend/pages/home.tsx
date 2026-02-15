@@ -25,7 +25,8 @@ const Home: React.FC = () => {
 
   return (
     <AnimatePresence initial={false}>
-      <div className="h-[90%] mx-auto mt-[5%] w-[90%]">
+      <main className="h-[90%] mx-auto mt-[5%] w-[90%]">
+        <h1 className="sr-only">AI 銳評產生器 — Tier List 排名</h1>
         <div className="grid grid-cols-1 gap-10 w-full md:grid-cols-3">
           <div className="col-span-1 flex flex-col md:col-span-2">
             {config.tierList.map((label, index) => (
@@ -66,7 +67,7 @@ const Home: React.FC = () => {
             <InputGroupIcon onDecided={handleTierDecided} />
           </div>
         </div>
-      </div>
+      </main>
 
       {/* Case Detail Modal */}
       <CaseDetailModal
