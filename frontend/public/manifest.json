@@ -1,7 +1,7 @@
 {
   "name": "AI 銳評產生器",
   "short_name": "AI銳評",
-  "description": "上傳圖片，讓 AI 幫你銳評打分！自動產生 Tier List 排名。",
+  "description": "AI 銳評產生器！自動產生從「從夯到拉」銳評，可自訂語音、銳評者。免費使用，支援分享結果。",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
