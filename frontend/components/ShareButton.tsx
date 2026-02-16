@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, type RefObject } from "react";
 import { Button } from "./ui/button";
 import { Share2, Check } from "lucide-react";
 import { useReviewCases } from "../contexts/ReviewCaseContext";
@@ -8,7 +8,7 @@ import type { TurnstileInstance } from "@marsidev/react-turnstile";
 
 export const ShareButton: React.FC<{
   className?: string;
-  turnstile: TurnstileInstance | null;
+  turnstile: RefObject<TurnstileInstance | null>;
 }> = ({ className, turnstile }) => {
   const { cases } = useReviewCases();
   const [copied, setCopied] = useState(false);
@@ -22,7 +22,8 @@ export const ShareButton: React.FC<{
 
     setLoading(true);
     try {
-      const turnstileToken = turnstile?.getResponse();
+      // console.log(turnstile);
+      const turnstileToken = await turnstile.current?.getResponsePromise();
       if (!turnstileToken) {
         alert("驗證尚未完成，請等待數秒鐘後再試一次");
         return;

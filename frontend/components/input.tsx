@@ -87,6 +87,7 @@ export const TierInputGroup = ({
   const { addCase, updateCase } = useReviewCases();
 
   const turnstileRef = useRef<TurnstileInstance | null>(null);
+  const turnstileRefShare = useRef<TurnstileInstance | null>(null);
 
   // Reset state when starting new
   const resetState = () => {
@@ -523,10 +524,7 @@ export const TierInputGroup = ({
                   {progress === "setting" ? <SpeechIcon /> : <Loader />}
                   開始銳評
                 </Button>
-                <ShareButton
-                  className="col-span-1"
-                  turnstile={turnstileRef.current}
-                />
+                <ShareButton className="col-span-1" turnstile={turnstileRef} />
               </div>
             </form>
           </motion.div>
@@ -536,10 +534,10 @@ export const TierInputGroup = ({
       {progress === "finished" ? (
         <>
           <Turnstile
-            ref={turnstileRef}
+            ref={turnstileRefShare}
             siteKey={config.turnstile_site_key}
             options={{ size: "invisible", action: "submit-tier" }}
-            onExpire={turnstileRef.current?.reset}
+            onExpire={turnstileRefShare.current?.reset}
           />
           <div className="flex h-full w-full items-center justify-center flex-col gap-6">
             {!hasMoved && <EnterAnimation imgUrl={imgUrl} layoutId={imgUrl} />}
@@ -550,7 +548,7 @@ export const TierInputGroup = ({
                   <Button onClick={handleNext} variant="outline">
                     繼續銳評
                   </Button>
-                  <ShareButton turnstile={turnstileRef.current} />
+                  <ShareButton turnstile={turnstileRefShare} />
                 </div>
               )}
             </div>
