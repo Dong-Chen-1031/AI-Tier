@@ -45,7 +45,7 @@ import React from "react";
 import axios from "axios";
 import { useReviewCases } from "../contexts/ReviewCaseContext";
 import { ShareButton } from "./ShareButton";
-import { Turnstile } from "@marsidev/react-turnstile";
+import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 
 export interface TierRequest {
   subject: string; //V
@@ -86,7 +86,7 @@ export const InputGroupIcon = ({
 
   const { addCase, updateCase } = useReviewCases();
 
-  const turnstileRef = useRef<any>(null);
+  const turnstileRef = useRef<TurnstileInstance | null>(null);
 
   // Reset state when starting new
   const resetState = () => {
@@ -219,8 +219,12 @@ export const InputGroupIcon = ({
     if (!editLevel) {
       delete payload.tier;
     }
-
+    if (!payload.turnstileToken) {
+      alert("驗證尚未完成，請等待數秒鐘後再試一次");
+      return;
+    }
     setProgress("loading");
+    turnstileRef.current?.reset();
     const img_url = await startTier(payload);
     setImgUrl(img_url);
     setProgress("finished");
@@ -251,10 +255,7 @@ export const InputGroupIcon = ({
             className="flex h-full flex-col justify-center"
           >
             <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                turnstileRef.current?.execute();
-              }}
+              onSubmit={handleSubmit(onSubmit)}
               className="grid w-full gap-6"
             >
               <FieldGroup>
@@ -496,22 +497,24 @@ export const InputGroupIcon = ({
                   )}
                 />
               </Field>
-              <Controller
-                name="turnstileToken"
-                control={control}
-                render={({ field }) => (
-                  <Turnstile
-                    ref={turnstileRef}
-                    siteKey={config.turnstile_site_key}
-                    options={{ size: "invisible" }}
-                    onSuccess={(token) => {
-                      field.onChange(token);
-                      handleSubmit(onSubmit)();
-                    }}
-                  />
-                )}
-              />
               <div className="w-full grid grid-cols-3 gap-4 mt-6">
+                <div className="hidden">
+                  <Controller
+                    name="turnstileToken"
+                    control={control}
+                    render={({ field }) => (
+                      <Turnstile
+                        ref={turnstileRef}
+                        siteKey={config.turnstile_site_key}
+                        options={{ size: "invisible" }}
+                        onSuccess={(token) => {
+                          field.onChange(token);
+                        }}
+                        onExpire={turnstileRef.current?.reset}
+                      />
+                    )}
+                  />
+                </div>
                 <Button
                   className="cursor-pointer col-span-2"
                   variant="outline"
