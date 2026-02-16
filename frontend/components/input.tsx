@@ -45,6 +45,7 @@ import React from "react";
 import axios from "axios";
 import { useReviewCases } from "../contexts/ReviewCaseContext";
 import { ShareButton } from "./ShareButton";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 export interface TierRequest {
   subject: string; //V
@@ -57,6 +58,7 @@ export interface TierRequest {
   tts_speed?: number | null; //V
   llm_model?: string | null; //V
   style?: string | null; //V
+  turnstileToken?: string | null; //V
 }
 
 export const InputGroupIcon = ({
@@ -83,6 +85,8 @@ export const InputGroupIcon = ({
   const [isTimeToMove, setIsTimeToMove] = useState(false);
 
   const { addCase, updateCase } = useReviewCases();
+
+  const turnstileRef = useRef<any>(null);
 
   // Reset state when starting new
   const resetState = () => {
@@ -247,7 +251,10 @@ export const InputGroupIcon = ({
             className="flex h-full flex-col justify-center"
           >
             <form
-              onSubmit={handleSubmit(onSubmit)}
+              onSubmit={async (e) => {
+                e.preventDefault();
+                turnstileRef.current?.execute();
+              }}
               className="grid w-full gap-6"
             >
               <FieldGroup>
@@ -361,7 +368,10 @@ export const InputGroupIcon = ({
                       onValueChange={field.onChange}
                       value={field.value ?? undefined}
                     >
-                      <SelectTrigger className="w-full max-w-48 select-none">
+                      <SelectTrigger
+                        className="w-full max-w-48 select-none"
+                        aria-label="選擇大語言模型"
+                      >
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent position="popper" className="select-none">
@@ -397,7 +407,10 @@ export const InputGroupIcon = ({
                       onValueChange={field.onChange}
                       value={field.value ?? undefined}
                     >
-                      <SelectTrigger className="w-full max-w-48 select-none">
+                      <SelectTrigger
+                        className="w-full max-w-48 select-none"
+                        aria-label="選擇風格"
+                      >
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent position="popper" className="select-none">
@@ -454,6 +467,7 @@ export const InputGroupIcon = ({
                       min={0.1}
                       step={0.01}
                       className="mx-auto w-full select-none"
+                      aria-label="朗讀速度"
                       onValueChange={(value) =>
                         field.onChange(Math.round(value[0] * 10) / 10)
                       }
@@ -482,6 +496,21 @@ export const InputGroupIcon = ({
                   )}
                 />
               </Field>
+              <Controller
+                name="turnstileToken"
+                control={control}
+                render={({ field }) => (
+                  <Turnstile
+                    ref={turnstileRef}
+                    siteKey={config.turnstile_site_key}
+                    options={{ size: "invisible" }}
+                    onSuccess={(token) => {
+                      field.onChange(token);
+                      handleSubmit(onSubmit)();
+                    }}
+                  />
+                )}
+              />
               <div className="w-full grid grid-cols-3 gap-4 mt-6">
                 <Button
                   className="cursor-pointer col-span-2"
@@ -498,6 +527,7 @@ export const InputGroupIcon = ({
           </motion.div>
         ) : null}
       </AnimatePresence>
+
       {progress === "finished" ? (
         <div className="flex h-full w-full items-center justify-center flex-col gap-6">
           {!hasMoved && <EnterAnimation imgUrl={imgUrl} layoutId={imgUrl} />}

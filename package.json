@@ -12,6 +12,7 @@
     "backend": "cd ./backend && fastapi dev"
   },
   "dependencies": {
+    "@marsidev/react-turnstile": "^1.4.2",
     "@tailwindcss/vite": "^4.1.18",
     "axios": "^1.13.4",
     "class-variance-authority": "^0.7.1",

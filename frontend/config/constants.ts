@@ -19,5 +19,6 @@ export const config = {
     "arcee-ai/trinity-large-preview:free",
   ],
   api_endpoints: import.meta.env.VITE_API_ENDPOINT || "http://127.0.0.1:8000",
+  turnstile_site_key: import.meta.env.VITE_TURNSTILE_SITE_KEY || "",
 } as const;
 export default config;
