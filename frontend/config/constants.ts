@@ -12,11 +12,10 @@ export const config = {
   // API 端點
   LLMs: [
     "google/gemini-2.5-flash",
-    "google/gemini-2-flash",
-    "google/gemini-2-flash-lite",
+    "google/gemini-2.0-flash",
+    "google/gemini-2.0-flash-lite",
     "google/gemini-2.5-flash-lite",
-    "google/gemini-3-flash",
-    "arcee-ai/trinity-large-preview:free",
+    "google/gemini-3-flash-preview",
   ],
   api_endpoints: import.meta.env.VITE_API_ENDPOINT || "http://127.0.0.1:8000",
   turnstile_site_key: import.meta.env.VITE_TURNSTILE_SITE_KEY || "",

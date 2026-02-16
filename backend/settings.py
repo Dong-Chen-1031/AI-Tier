@@ -23,12 +23,11 @@ DEFAULT_TTS_MODEL = "a9372068ed0740b48326cf9a74d7496a"
 
 LLMs = Literal[
     "google/gemini-2.5-flash",
-    "google/gemini-2-flash",
-    "google/gemini-2-flash-lite",
+    "google/gemini-2.0-flash",
+    "google/gemini-2.0-flash-lite",
     "google/gemini-2.5-flash-lite",
-    "google/gemini-3-flash",
+    "google/gemini-3-flash-preview",
 ]
-
 LLMs_list = list(get_args(LLMs))
 
 
