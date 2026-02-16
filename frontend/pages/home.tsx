@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import config from "../config/constants";
-import { InputGroupIcon } from "../components/input";
+import { TierInputGroup } from "../components/input";
 import { AnimatePresence, motion } from "motion/react";
 import { useReviewCases } from "../contexts/ReviewCaseContext";
 import { CaseDetailModal } from "../components/CaseDetailModal";
@@ -64,7 +64,7 @@ const Home: React.FC = () => {
             ))}
           </div>
           <div className="h-full bg-card p-5 rounded-md overflow-hidden">
-            <InputGroupIcon onDecided={handleTierDecided} />
+            <TierInputGroup onDecided={handleTierDecided} />
           </div>
         </div>
       </main>

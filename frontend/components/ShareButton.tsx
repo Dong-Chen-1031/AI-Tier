@@ -4,10 +4,12 @@ import { Share2, Check } from "lucide-react";
 import { useReviewCases } from "../contexts/ReviewCaseContext";
 import axios from "axios";
 import config from "../config/constants";
+import type { TurnstileInstance } from "@marsidev/react-turnstile";
 
-export const ShareButton: React.FC<{ className?: string }> = ({
-  className,
-}) => {
+export const ShareButton: React.FC<{
+  className?: string;
+  turnstile: TurnstileInstance | null;
+}> = ({ className, turnstile }) => {
   const { cases } = useReviewCases();
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -20,8 +22,14 @@ export const ShareButton: React.FC<{ className?: string }> = ({
 
     setLoading(true);
     try {
+      const turnstileToken = turnstile?.getResponse();
+      if (!turnstileToken) {
+        alert("驗證尚未完成，請等待數秒鐘後再試一次");
+        return;
+      }
       const response = await axios.post(`${config.api_endpoints}/save-cases`, {
         cases: cases,
+        turnstile_token: turnstileToken,
       });
 
       const shareId = response.data.share_id;

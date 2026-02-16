@@ -214,12 +214,20 @@ class SaveCasesRequest(BaseModel):
     """保存案例的請求模型"""
 
     cases: list[ReviewCaseModel]
+    turnstile_token: str
 
 
 @app.post("/save-cases")
 async def save_cases(request: Request, save_request: SaveCasesRequest):
     """保存所有案例到 JSON 文件"""
     try:
+        if not save_request.turnstile_token:
+            raise HTTPException(status_code=400, detail="Turnstile token is required")
+        validate = await async_validate(
+            token=save_request.turnstile_token, secret=settings.TURNSTILE_SECRET_KEY
+        )
+        if not validate.success:
+            raise HTTPException(status_code=400, detail="Turnstile validation failed")
         body = await request.body()
         body_size = len(body)
 

@@ -61,7 +61,7 @@ export interface TierRequest {
   turnstile_token?: string | null; //V
 }
 
-export const InputGroupIcon = ({
+export const TierInputGroup = ({
   onDecided,
 }: {
   onDecided?: (tier: string, url: string) => void;
@@ -523,7 +523,10 @@ export const InputGroupIcon = ({
                   {progress === "setting" ? <SpeechIcon /> : <Loader />}
                   開始銳評
                 </Button>
-                <ShareButton className="col-span-1" />
+                <ShareButton
+                  className="col-span-1"
+                  turnstile={turnstileRef.current}
+                />
               </div>
             </form>
           </motion.div>
@@ -531,20 +534,28 @@ export const InputGroupIcon = ({
       </AnimatePresence>
 
       {progress === "finished" ? (
-        <div className="flex h-full w-full items-center justify-center flex-col gap-6">
-          {!hasMoved && <EnterAnimation imgUrl={imgUrl} layoutId={imgUrl} />}
-          <div className="flex flex-col items-center gap-4">
-            <p>{message}</p>
-            {hasMoved && (
-              <div className="flex gap-4">
-                <Button onClick={handleNext} variant="outline">
-                  繼續銳評
-                </Button>
-                <ShareButton />
-              </div>
-            )}
+        <>
+          <Turnstile
+            ref={turnstileRef}
+            siteKey={config.turnstile_site_key}
+            options={{ size: "invisible", action: "submit-tier" }}
+            onExpire={turnstileRef.current?.reset}
+          />
+          <div className="flex h-full w-full items-center justify-center flex-col gap-6">
+            {!hasMoved && <EnterAnimation imgUrl={imgUrl} layoutId={imgUrl} />}
+            <div className="flex flex-col items-center gap-4">
+              <p>{message}</p>
+              {hasMoved && (
+                <div className="flex gap-4">
+                  <Button onClick={handleNext} variant="outline">
+                    繼續銳評
+                  </Button>
+                  <ShareButton turnstile={turnstileRef.current} />
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        </>
       ) : null}
     </>
   );
