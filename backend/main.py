@@ -15,6 +15,7 @@ from pydantic import BaseModel
 from settings import DEV_MODE
 from starlette.responses import StreamingResponse
 from utils.log import logger
+from utils.turnstile import async_validate
 
 docs_url = "/docs" if DEV_MODE else None  # disables docs
 redoc_url = "/redoc" if DEV_MODE else None  # disables redoc
@@ -71,6 +72,7 @@ class TierRequest(BaseModel):
     tts_speed: float = 1.0
     llm_model: LLMs = "google/gemini-2.5-flash"
     style: Optional[str] = None
+    turnstile_token: Optional[str] = None
 
     def __repr__(self):
         nt = "\n\t"
@@ -143,6 +145,16 @@ async def text(case_id: str) -> StreamingResponse:
 async def chat(chat_input: TierRequest) -> TierResponse:
     """處理聊天請求，返回一個唯一的 UUID 以識別這次對話"""
     uuid = uuid4().hex
+
+    if not chat_input.turnstile_token:
+        raise HTTPException(status_code=400, detail="Turnstile token is required")
+
+    validate = await async_validate(
+        token=chat_input.turnstile_token, secret=settings.TURNSTILE_SECRET_KEY
+    )
+
+    if not validate.success:
+        raise HTTPException(status_code=400, detail="Turnstile validation failed")
 
     ApiService(
         prompt=chat_input.to_prompt(),

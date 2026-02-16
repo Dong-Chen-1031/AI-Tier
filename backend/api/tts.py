@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from fastapi import HTTPException
 from fishaudio import AsyncFishAudio
 from rich.traceback import install
-from settings import FISH_API_KEY
+from settings import DEFAULT_TTS_MODEL, FISH_API_KEY
 
 converter_s2t = opencc.OpenCC("s2t")
 
@@ -42,6 +42,9 @@ def websocket_tts(
     speed: Optional[float] = None,
 ) -> AsyncGenerator[bytes, Any]:
     client = AsyncFishAudio(api_key=FISH_API_KEY)
+
+    if not model:
+        model = DEFAULT_TTS_MODEL
 
     # Stream audio via WebSocket
     audio_stream = client.tts.stream_websocket(

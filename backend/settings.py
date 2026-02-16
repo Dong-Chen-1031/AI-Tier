@@ -17,6 +17,10 @@ IMG_API_KEY = getenv("IMG_API_KEY", "")
 
 DEV_MODE = getenv("APP_MODE", "production") == "dev"
 
+TURNSTILE_SECRET_KEY = getenv("TURNSTILE_SECRET_KEY", "")
+
+DEFAULT_TTS_MODEL = "a9372068ed0740b48326cf9a74d7496a"
+
 LLMs = Literal[
     "google/gemini-2.5-flash",
     "google/gemini-2-flash",

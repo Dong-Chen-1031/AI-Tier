@@ -58,7 +58,7 @@ export interface TierRequest {
   tts_speed?: number | null; //V
   llm_model?: string | null; //V
   style?: string | null; //V
-  turnstileToken?: string | null; //V
+  turnstile_token?: string | null; //V
 }
 
 export const InputGroupIcon = ({
@@ -206,7 +206,6 @@ export const InputGroupIcon = ({
         tier: config.tierList[0],
         llm_model: config.LLMs[0],
         style: "不指定",
-        tts_model: "",
         tts_speed: 1,
         tts: true,
       },
@@ -219,7 +218,7 @@ export const InputGroupIcon = ({
     if (!editLevel) {
       delete payload.tier;
     }
-    if (!payload.turnstileToken) {
+    if (!payload.turnstile_token) {
       alert("驗證尚未完成，請等待數秒鐘後再試一次");
       return;
     }
@@ -500,13 +499,13 @@ export const InputGroupIcon = ({
               <div className="w-full grid grid-cols-3 gap-4 mt-6">
                 <div className="hidden">
                   <Controller
-                    name="turnstileToken"
+                    name="turnstile_token"
                     control={control}
                     render={({ field }) => (
                       <Turnstile
                         ref={turnstileRef}
                         siteKey={config.turnstile_site_key}
-                        options={{ size: "invisible" }}
+                        options={{ size: "invisible", action: "submit-tier" }}
                         onSuccess={(token) => {
                           field.onChange(token);
                         }}
