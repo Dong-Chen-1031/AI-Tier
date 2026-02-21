@@ -12,10 +12,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from pyturnstile import Turnstile
 from settings import DEV_MODE
 from starlette.responses import StreamingResponse
 from utils.log import logger
-from utils.turnstile import async_validate
 
 docs_url = "/docs" if DEV_MODE else None  # disables docs
 redoc_url = "/redoc" if DEV_MODE else None  # disables redoc
@@ -55,6 +55,8 @@ MAX_FILE_SIZE_MB = 1  # 最大文件大小（MB）
 MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
 
 Tiers = Literal["夯", "頂級", "人上人", "NPC", "拉完了"]
+
+turnstile = Turnstile(secret=settings.TURNSTILE_SECRET_KEY)
 
 
 def if_exists(string: str, *args, **kwargs) -> str:
@@ -149,9 +151,7 @@ async def chat(chat_input: TierRequest) -> TierResponse:
     if not chat_input.turnstile_token:
         raise HTTPException(status_code=400, detail="Turnstile token is required")
 
-    validate = await async_validate(
-        token=chat_input.turnstile_token, secret=settings.TURNSTILE_SECRET_KEY
-    )
+    validate = await turnstile.async_validate(token=chat_input.turnstile_token)
 
     if not validate.success:
         raise HTTPException(status_code=400, detail="Turnstile validation failed")
@@ -223,9 +223,7 @@ async def save_cases(request: Request, save_request: SaveCasesRequest):
     try:
         if not save_request.turnstile_token:
             raise HTTPException(status_code=400, detail="Turnstile token is required")
-        validate = await async_validate(
-            token=save_request.turnstile_token, secret=settings.TURNSTILE_SECRET_KEY
-        )
+        validate = await turnstile.async_validate(token=save_request.turnstile_token)
         if not validate.success:
             raise HTTPException(status_code=400, detail="Turnstile validation failed")
         body = await request.body()

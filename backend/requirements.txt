@@ -8,3 +8,4 @@ fish-audio-sdk
 rich
 opencc-python-reimplemented
 aiofiles
+pyturnstile
