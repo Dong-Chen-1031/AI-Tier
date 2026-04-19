@@ -1,6 +1,6 @@
 # AI-Tier
 
-Ever wanted a brutally honest AI to judge literally anything and rank it on a tier list? That is exactly what AI-Tier does. Type in a subject — a person, food, concept, whatever — pick a character for the AI to roleplay as (Trump, Steve Jobs, you name it), and watch it roast or praise your subject in real time. The verdict arrives with a matching image, an animated tier placement, and optionally read aloud in the voice of almost any public figure on the planet.
+Ever wanted a brutally honest AI to tier literally anything and rank it on a tier list? That is exactly what AI-Tier does. Type in a subject — a person, food, concept, whatever — input a character for the AI to roleplay as (Trump, Steve Jobs, you name it), and watch it roast or praise your subject in real time. The verdict arrives with a matching image, an animated tier placement, and optionally read aloud in the voice of almost any public figure on the planet.
 
 Live demo: https://ai-tier.doong.me
 
