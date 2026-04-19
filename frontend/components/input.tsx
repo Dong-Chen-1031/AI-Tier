@@ -260,7 +260,7 @@ export const TierInputGroup = ({
                 ref={audioRef}
                 onEnded={() => setAudioFinished(true)}></audio>
 
-            <AnimatePresence>
+            <AnimatePresence mode="popLayout">
                 {progress === "setting" || progress === "loading" ? (
                     <motion.div
                         animate={{ opacity: 1, scale: 1 }}
