@@ -7,16 +7,19 @@ from api.tts import get_models
 from utils.log import logger
 
 
-async def fetch_one(sort_by: str = "score", auto_copy: bool = True) -> None:
+async def fetch_one(
+    sort_by: str = "score", auto_copy: bool = True, lang: str = "zh-TW"
+) -> None:
     """從 Fish API 根據指定的排序方式獲取模型列表並保存到本地 JSON 文件"""
-    logger.info(f"Fetching models sorted by {sort_by}...")
+    lang_suffix = "_en" if not lang.startswith("zh") else ""
+    logger.info(f"Fetching models sorted by {sort_by} (lang={lang})...")
 
-    output_path = f"storage/fish_model/{sort_by}.json"
+    output_path = f"storage/fish_model/{sort_by}{lang_suffix}.json"
 
     with open(output_path, "w", encoding="utf-8") as f:
         for attempt in range(5):
             try:
-                models = await get_models(sort_by=sort_by)
+                models = await get_models(sort_by=sort_by, lang=lang)
                 break
             except Exception as e:
                 logger.error(f"Error fetching models sorted by {sort_by}: {e}")
@@ -29,9 +32,8 @@ async def fetch_one(sort_by: str = "score", auto_copy: bool = True) -> None:
         json.dump(models, f, ensure_ascii=False)
 
     if auto_copy:
-        frontend_json = f"../frontend/assets/fish_model/{sort_by}.json"
+        frontend_json = f"../frontend/assets/fish_model/{sort_by}{lang_suffix}.json"
         path2 = pathlib.Path(__file__).parent.parent / frontend_json
-        # logger.info(f"Checking if frontend path {path2} exists for copying...")
 
         if path2.parent.exists():
             shutil.copyfile(pathlib.Path(output_path), path2)
@@ -40,10 +42,10 @@ async def fetch_one(sort_by: str = "score", auto_copy: bool = True) -> None:
             )
 
 
-async def main(auto_copy: bool = True):
+async def main(auto_copy: bool = True, lang: str = "zh-TW"):
     await asyncio.gather(
         *[
-            fetch_one(sort_by=sort_by, auto_copy=auto_copy)
+            fetch_one(sort_by=sort_by, auto_copy=auto_copy, lang=lang)
             for sort_by in ["task_count", "created_at", "score"]
         ]
     )

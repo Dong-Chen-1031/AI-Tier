@@ -55,6 +55,7 @@ MAX_FILE_SIZE_MB = 1  # 最大文件大小（MB）
 MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
 
 Tiers = Literal["夯", "頂級", "人上人", "NPC", "拉完了"]
+TiersEN = Literal["F", "A", "B", "C", "D"]
 
 turnstile = Turnstile(secret=settings.TURNSTILE_SECRET_KEY)
 
@@ -67,7 +68,7 @@ class TierRequest(BaseModel):
     subject: str
     role_name: str = "銳評AI"
     role_description: Optional[str] = None
-    tier: Optional[Tiers] = None
+    tier: Optional[str] = None
     suggestion: Optional[str] = None
     tts: Optional[bool] = None
     tts_model: Optional[str] = None
@@ -75,15 +76,21 @@ class TierRequest(BaseModel):
     llm_model: LLMs = "google/gemini-2.5-flash"
     style: Optional[str] = None
     turnstile_token: Optional[str] = None
+    lang: str = "zh-TW"
 
     def __repr__(self):
         nt = "\n\t"
-        return f"TierRequest({nt}subject={self.subject}, {nt}role_name={self.role_name}, {nt}role_description={self.role_description}, {nt}tier={self.tier}, {nt}suggestion={self.suggestion}, {nt}tts={self.tts}, {nt}tts_model={self.tts_model}, {nt}tts_speed={self.tts_speed}, {nt}llm_model={self.llm_model}, {nt}style={self.style}\n)"
+        return f"TierRequest({nt}subject={self.subject}, {nt}role_name={self.role_name}, {nt}role_description={self.role_description}, {nt}tier={self.tier}, {nt}suggestion={self.suggestion}, {nt}tts={self.tts}, {nt}tts_model={self.tts_model}, {nt}tts_speed={self.tts_speed}, {nt}llm_model={self.llm_model}, {nt}style={self.style}, {nt}lang={self.lang}\n)"
 
     def __str__(self):
         return self.__repr__()
 
     def to_prompt(self) -> str:
+        if self.lang.startswith("zh"):
+            return self._to_prompt_zh()
+        return self._to_prompt_en()
+
+    def _to_prompt_zh(self) -> str:
         tt = "銳評"
 
         prompt = (
@@ -113,6 +120,34 @@ class TierRequest(BaseModel):
             f"{if_exists('使用者請求你以「{}」的風格來進行銳評。希望你能參考其建議來進行。\n', self.style)}"
             f"{if_exists('以下是一些使用者而額外的請求：{}。\n', self.suggestion)}"
             f"現在請開始你的銳評吧！請遵守上方的規範，相信你可做到的！"
+        )
+        return prompt
+
+    def _to_prompt_en(self) -> str:
+        prompt = (
+            f"You are a roast/review AI role-playing as {self.role_name}. You rate things on a 5-tier scale: F (best), A (great), B (decent), C (mediocre), D (worst).\n"
+            f"Think of this like making a Tier List — like those YouTubers or streamers who rank things into tiers and explain why.\n"
+            f"Your tone should NOT be rational analysis — it should be a sharp, opinionated roast. Be subjective, bold, and persuasive.\n"
+            f"Output a single paragraph, no longer than 100 words, no line breaks, no bullet points. Be punchy and concise. Include one tier rating in your response.\n"
+            f"You should lean towards using 'F' and 'D' more often — that makes the roast spicier. If everything is 'B' or 'C', it's too boring and middle-of-the-road.\n"
+            f"Make it eye-catching and memorable. Show personality — be a bit savage. That's what makes a good roast.\n"
+            f"IMPORTANT: You MUST include exactly ONE tier tag in brackets in your text: [F], [A], [B], [C], or [D]. This tag triggers the frontend to move the image to the corresponding tier. It will be hidden from the user and NOT read by TTS.\n"
+            f"Because the tag is hidden, you must also write out the tier in plain text alongside it. For example: 'This absolutely deserves an F[F]' — NOT just '[F]' alone, because the user won't see or hear the bracketed part.\n"
+            f"Don't reveal the rating too early. Build up your commentary first, then drop the rating at the end for dramatic effect.\n"
+            f"Since this will be read aloud by TTS, do NOT use emojis or markdown. Use plain text only.\n"
+            f"Reply in English with a casual, conversational tone.\n"
+            f"Here are some example reveal sentences:\n"
+            f"1. This thing absolutely deserves an F[F]\n"
+            f"2. I'd say this is a solid A[A]\n"
+            f"3. This can only get a B[B]\n"
+            f"4. This is just C-tier[C]\n"
+            f"5. This is a straight D[D]\n"
+            f"You are '{self.role_name}'. Stay in character — adopt their mannerisms, speech patterns, and perspective. Speak in first person as them. Don't say '{self.role_name} thinks...' — just BE them.\n"
+            f"{if_exists('Here is a character description to help you stay in role: {}.\n', self.role_description)}"
+            f"Today you are reviewing: '{self.subject}'{if_exists('. The user has pre-set the tier to {}. You must naturally explain why and conclude with that rating.', self.tier)}\n"
+            f"{if_exists('The user wants the roast in this style: {}.\n', self.style)}"
+            f"{if_exists('Additional user requests: {}.\n', self.suggestion)}"
+            f"Now begin your roast! Follow the rules above."
         )
         return prompt
 
@@ -164,7 +199,7 @@ async def chat(chat_input: TierRequest) -> TierResponse:
         tts_speed=chat_input.tts_speed,
     ).start()
 
-    img_url = await search_images(chat_input.subject)
+    img_url = await search_images(chat_input.subject, lang=chat_input.lang)
 
     # print(f"Received message: {chat_input}")
 
@@ -174,12 +209,16 @@ async def chat(chat_input: TierRequest) -> TierResponse:
 
 
 @app.get("/models")
-async def get_model(model_name: Optional[str] = None, sort_by: Optional[str] = "score"):
+async def get_model(
+    model_name: Optional[str] = None,
+    sort_by: Optional[str] = "score",
+    lang: Optional[str] = "zh-TW",
+):
     """獲取模型列表"""
     if not model_name:
         with open(f"storage/fish_model/{sort_by}.json", "r", encoding="utf-8") as f:
             models = json.load(f)
-    models = await Tts.get_models(model_name, sort_by)
+    models = await Tts.get_models(model_name, sort_by, lang=lang)
     return models
 
 

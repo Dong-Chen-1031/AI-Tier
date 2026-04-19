@@ -1,0 +1,85 @@
+{
+    "home": {
+        "title": "Create a Tier List for Anything"
+    },
+    "shared": {
+        "docTitle": "Shared Tier List — AI Tier List",
+        "defaultDocTitle": "AI Tier List — Create a Tier List for Anything",
+        "heading": "Shared Tier Lists",
+        "createBtn": "Create Your Tier List",
+        "error": {
+            "title": "Error",
+            "load": "Failed to load shared Tier List"
+        }
+    },
+    "notFound": {
+        "title": "Page Not Found",
+        "description": "The page you're looking for doesn't exist or may have been removed.",
+        "back": "Go Home"
+    },
+    "modal": {
+        "reviewContent": "Review:",
+        "audioNotSupported": "Your browser does not support the audio element.",
+        "formInfo": "Form Info",
+        "reviewer": "Reviewer:",
+        "roleDescription": "Role Description:",
+        "style": "Style:",
+        "model": "Model:",
+        "suggestions": "Suggestions:"
+    },
+    "form": {
+        "subject": " Tier this...",
+        "reviewer": "Reviewer (Optional)",
+        "reviewerDescription": "Reviewer Description (Optional)",
+        "suggestions": "Suggestions (Optional)",
+        "setLevel": "Set Tier",
+        "selectModel": "Select LLM",
+        "modelGroup": "Models",
+        "selectStyle": "Select Style",
+        "styleGroup": "Styles",
+        "styles": {
+            "default": "Default",
+            "sarcastic": "Sarcastic",
+            "generous": "Generous",
+            "humorous": "Humorous",
+            "serious": "Serious",
+            "joyful": "Joyful"
+        },
+        "readingSpeed": "Reading Speed",
+        "ttsEnabled": "Enable TTS",
+        "startBtn": "Start Tier",
+        "continueBtn": "Continue Tiering",
+        "verifyWait": "Verification not complete, please wait a moment and try again",
+        "selectTier": "Select {{tier}}"
+    },
+    "shareButton": {
+        "noCase": "No cases to share",
+        "verifyWait": "Verification not complete, please wait a moment and try again",
+        "error": "Share failed, please try again later",
+        "copied": "Link Copied",
+        "share": "Share"
+    },
+    "styleDisplay": {
+        "不指定": "Default",
+        "尖酸刻薄": "Sarcastic",
+        "寬宏大量": "Generous",
+        "幽默風趣": "Humorous",
+        "不苟言笑": "Serious",
+        "歡樂喜悅": "Joyful"
+    },
+    "modelSelector": {
+        "selectedModel": "Selected: {{name}}",
+        "selectVoice": "Select Voice Model",
+        "dialogTitle": "Select Voice Model",
+        "dialogDescription": "Search for models on Fish Audio",
+        "searchPlaceholder": "Search model, e.g.: Trump",
+        "searching": "Searching...",
+        "search": "Search",
+        "noResults": "No models found",
+        "typeToSearch": "Type a keyword to search",
+        "noDescription": "No description",
+        "preview": "Preview",
+        "selected": "Selected",
+        "select": "Select"
+    }
+}

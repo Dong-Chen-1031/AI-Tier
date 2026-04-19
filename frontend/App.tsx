@@ -6,29 +6,35 @@ import SharedView from "./pages/shared";
 import NotFound from "./pages/not-found";
 import { ThemeProvider } from "./components/theme-provider";
 import { ReviewCaseProvider } from "./contexts/ReviewCaseContext";
+import { LanguageSwitcher } from "./components/LanguageSwitcher";
 
 function App() {
-  return (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <ReviewCaseProvider>
-        <BrowserRouter>
-          <Suspense
-            fallback={
-              <div className="flex items-center justify-center min-h-screen">
-                <Loader />
-              </div>
-            }
-          >
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/share/:shareId" element={<SharedView />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
-      </ReviewCaseProvider>
-    </ThemeProvider>
-  );
+    return (
+        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+            <ReviewCaseProvider>
+                <BrowserRouter>
+                    <div className="fixed top-3 right-4 z-50">
+                        <LanguageSwitcher />
+                    </div>
+                    <Suspense
+                        fallback={
+                            <div className="flex items-center justify-center min-h-screen">
+                                <Loader />
+                            </div>
+                        }>
+                        <Routes>
+                            <Route path="/" element={<Home />} />
+                            <Route
+                                path="/share/:shareId"
+                                element={<SharedView />}
+                            />
+                            <Route path="*" element={<NotFound />} />
+                        </Routes>
+                    </Suspense>
+                </BrowserRouter>
+            </ReviewCaseProvider>
+        </ThemeProvider>
+    );
 }
 
 export default App;

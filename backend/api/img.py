@@ -2,9 +2,12 @@ import httpx
 from settings import IMG_API_KEY
 
 
-async def search_images(query: str) -> list[str]:
+async def search_images(query: str, lang: str = "zh-TW") -> list[str]:
     url = "https://google.serper.dev/images"
-    payload = {"q": query, "gl": "tw", "hl": "zh-tw"}
+    if lang.startswith("zh"):
+        payload = {"q": query, "gl": "tw", "hl": "zh-tw"}
+    else:
+        payload = {"q": query, "gl": "us", "hl": "en"}
     headers = {
         "X-API-KEY": IMG_API_KEY,
         "Content-Type": "application/json",

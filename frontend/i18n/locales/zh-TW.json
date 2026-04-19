@@ -1,0 +1,85 @@
+{
+    "home": {
+        "title": "AI 銳評產生器 — 萬物皆可 Tier"
+    },
+    "shared": {
+        "docTitle": "分享的銳評結果 — AI 銳評產生器",
+        "defaultDocTitle": "AI 銳評產生器 — 萬物皆可 Tier",
+        "heading": "分享的銳評結果",
+        "createBtn": "建立你的銳評",
+        "error": {
+            "title": "錯誤",
+            "load": "無法載入分享的案例"
+        }
+    },
+    "notFound": {
+        "title": "找不到頁面",
+        "description": "你要找的頁面不存在，可能已被移除或網址有誤。",
+        "back": "回到首頁，開始銳評"
+    },
+    "modal": {
+        "reviewContent": "銳評內容：",
+        "audioNotSupported": "您的瀏覽器不支援音訊元素。",
+        "formInfo": "表單資訊",
+        "reviewer": "銳評者:",
+        "roleDescription": "角色描述:",
+        "style": "風格:",
+        "model": "模型:",
+        "suggestions": "其他建議:"
+    },
+    "form": {
+        "subject": "銳評目標",
+        "reviewer": "銳評者 [可選]",
+        "reviewerDescription": "銳評者描述 [可選]",
+        "suggestions": "其他建議 [可選]",
+        "setLevel": "是否指定銳評等級",
+        "selectModel": "選擇大語言模型",
+        "modelGroup": "模型",
+        "selectStyle": "選擇風格",
+        "styleGroup": "風格",
+        "styles": {
+            "default": "不指定",
+            "sarcastic": "尖酸刻薄",
+            "generous": "寬宏大量",
+            "humorous": "幽默風趣",
+            "serious": "不苟言笑",
+            "joyful": "歡樂喜悅"
+        },
+        "readingSpeed": "朗讀速度",
+        "ttsEnabled": "啟用文字朗讀功能",
+        "startBtn": "開始銳評",
+        "continueBtn": "繼續銳評",
+        "verifyWait": "驗證尚未完成，請等待數秒鐘後再試一次",
+        "selectTier": "選擇 {{tier}}"
+    },
+    "shareButton": {
+        "noCase": "沒有可分享的案例",
+        "verifyWait": "驗證尚未完成，請等待數秒鐘後再試一次",
+        "error": "分享失敗，請稍後再試",
+        "copied": "已複製連結",
+        "share": "分享"
+    },
+    "styleDisplay": {
+        "不指定": "不指定",
+        "尖酸刻薄": "尖酸刻薄",
+        "寬宏大量": "寬宏大量",
+        "幽默風趣": "幽默風趣",
+        "不苟言笑": "不苟言笑",
+        "歡樂喜悅": "歡樂喜悅"
+    },
+    "modelSelector": {
+        "selectedModel": "已選擇模型: {{name}}",
+        "selectVoice": "選擇語音模型",
+        "dialogTitle": "選擇語音模型",
+        "dialogDescription": "輸入關鍵字搜尋 Fish Audio 上的模型",
+        "searchPlaceholder": "搜尋模型，例如：蔣介石",
+        "searching": "搜尋中...",
+        "search": "搜尋",
+        "noResults": "找不到相關模型",
+        "typeToSearch": "請輸入關鍵字並搜尋",
+        "noDescription": "無描述",
+        "preview": "試聽",
+        "selected": "已選擇",
+        "select": "選擇"
+    }
+}
