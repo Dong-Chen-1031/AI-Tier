@@ -12,7 +12,7 @@ from settings import API_SERVICE_TIME_OUT, LLMs, LLMs_list
 from utils.log import logger
 
 NO_VOICE = (
-    r"\[夯\]|\[頂級\]|\[人上人\]|\[NPC\]|\[拉完了\]|\[F\]|\[A\]|\[B\]|\[C\]|\[D\]"
+    r"\[夯\]|\[頂級\]|\[人上人\]|\[NPC\]|\[拉完了\]|\[S\]|\[A\]|\[B\]|\[C\]|\[D\]"
 )
 
 

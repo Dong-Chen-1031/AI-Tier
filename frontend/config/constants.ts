@@ -1,7 +1,7 @@
 // 應用程式配置常數
 
 const tierListZh = ["夯", "頂級", "人上人", "NPC", "拉完了"];
-const tierListEn = ["F", "A", "B", "C", "D"];
+const tierListEn = ["S", "A", "B", "C", "D"];
 const colorList = ["#F00", "#FFBF00", "#FF0", "#FFF2CC", "#FFF"];
 
 // Mapping from each tier label (both languages) to its color

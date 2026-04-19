@@ -147,7 +147,7 @@ export const TierInputGroup = ({
             const chunk = decoder.decode(value, { stream: true });
             fullText += chunk;
             const cleanText = fullText.replace(
-                /\[(夯|頂級|人上人|NPC|拉完了|F|A|B|C|D)\]/g,
+                /\[(夯|頂級|人上人|NPC|拉完了|S|A|B|C|D)\]/g,
                 "",
             );
             setMessage(cleanText);
@@ -157,7 +157,7 @@ export const TierInputGroup = ({
 
             if (!decided) {
                 const match = fullText.match(
-                    /\[(夯|頂級|人上人|NPC|拉完了|F|A|B|C|D)\]/,
+                    /\[(夯|頂級|人上人|NPC|拉完了|S|A|B|C|D)\]/,
                 );
                 if (match) {
                     decided = true;

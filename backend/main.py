@@ -55,7 +55,7 @@ MAX_FILE_SIZE_MB = 1  # 最大文件大小（MB）
 MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
 
 Tiers = Literal["夯", "頂級", "人上人", "NPC", "拉完了"]
-TiersEN = Literal["F", "A", "B", "C", "D"]
+TiersEN = Literal["S", "A", "B", "C", "D"]
 
 turnstile = Turnstile(secret=settings.TURNSTILE_SECRET_KEY)
 
@@ -125,19 +125,19 @@ class TierRequest(BaseModel):
 
     def _to_prompt_en(self) -> str:
         prompt = (
-            f"You are a roast/review AI role-playing as {self.role_name}. You rate things on a 5-tier scale: F (best), A (great), B (decent), C (mediocre), D (worst).\n"
+            f"You are a roast/review AI role-playing as {self.role_name}. You rate things on a 5-tier scale: S (best), A (great), B (decent), C (mediocre), D (worst).\n"
             f"Think of this like making a Tier List — like those YouTubers or streamers who rank things into tiers and explain why.\n"
             f"Your tone should NOT be rational analysis — it should be a sharp, opinionated roast. Be subjective, bold, and persuasive.\n"
             f"Output a single paragraph, no longer than 100 words, no line breaks, no bullet points. Be punchy and concise. Include one tier rating in your response.\n"
-            f"You should lean towards using 'F' and 'D' more often — that makes the roast spicier. If everything is 'B' or 'C', it's too boring and middle-of-the-road.\n"
+            f"You should lean towards using 'S' and 'D' more often — that makes the roast spicier. If everything is 'B' or 'C', it's too boring and middle-of-the-road.\n"
             f"Make it eye-catching and memorable. Show personality — be a bit savage. That's what makes a good roast.\n"
-            f"IMPORTANT: You MUST include exactly ONE tier tag in brackets in your text: [F], [A], [B], [C], or [D]. This tag triggers the frontend to move the image to the corresponding tier. It will be hidden from the user and NOT read by TTS.\n"
-            f"Because the tag is hidden, you must also write out the tier in plain text alongside it. For example: 'This absolutely deserves an F[F]' — NOT just '[F]' alone, because the user won't see or hear the bracketed part.\n"
+            f"IMPORTANT: You MUST include exactly ONE tier tag in brackets in your text: [S], [A], [B], [C], or [D]. This tag triggers the frontend to move the image to the corresponding tier. It will be hidden from the user and NOT read by TTS.\n"
+            f"Because the tag is hidden, you must also write out the tier in plain text alongside it. For example: 'This absolutely deserves an S[S]' — NOT just '[S]' alone, because the user won't see or hear the bracketed part.\n"
             f"Don't reveal the rating too early. Build up your commentary first, then drop the rating at the end for dramatic effect.\n"
             f"Since this will be read aloud by TTS, do NOT use emojis or markdown. Use plain text only.\n"
             f"Reply in English with a casual, conversational tone.\n"
             f"Here are some example reveal sentences:\n"
-            f"1. This thing absolutely deserves an F[F]\n"
+            f"1. This thing absolutely deserves an S[S]\n"
             f"2. I'd say this is a solid A[A]\n"
             f"3. This can only get a B[B]\n"
             f"4. This is just C-tier[C]\n"
