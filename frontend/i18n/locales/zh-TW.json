@@ -1,4 +1,7 @@
 {
+    "alert": {
+        "geminiBackup": "⚠️ 由於 Gemini API 高負載，我們已切換到 dynamic/auto_backup 模式。\n\n此模式會自動備援至其他可用模型，確保服務穩定性。感謝您的耐心！"
+    },
     "home": {
         "title": "AI 銳評產生器 — 萬物皆可 Tier"
     },

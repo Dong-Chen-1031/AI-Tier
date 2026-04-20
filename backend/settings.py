@@ -22,6 +22,7 @@ TURNSTILE_SECRET_KEY = getenv("TURNSTILE_SECRET_KEY", "")
 DEFAULT_TTS_MODEL = "a9372068ed0740b48326cf9a74d7496a"
 
 LLMs = Literal[
+    "dynamic/auto_backup",
     "google/gemini-2.5-flash",
     "google/gemini-2.0-flash",
     "google/gemini-2.0-flash-lite",
@@ -32,5 +33,6 @@ LLMs_list = list(get_args(LLMs))
 
 
 LLMs_to_api = {
-    model: model.replace("google", "google-ai-studio") for model in LLMs_list
+    model: model.replace("google", "google-ai-studio") if model.startswith("google") else model
+    for model in LLMs_list
 }

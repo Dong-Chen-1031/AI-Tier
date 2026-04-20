@@ -73,7 +73,7 @@ class TierRequest(BaseModel):
     tts: Optional[bool] = None
     tts_model: Optional[str] = None
     tts_speed: float = 1.0
-    llm_model: LLMs = "google/gemini-2.5-flash"
+    llm_model: LLMs = "dynamic/auto_backup"
     style: Optional[str] = None
     turnstile_token: Optional[str] = None
     lang: str = "zh-TW"

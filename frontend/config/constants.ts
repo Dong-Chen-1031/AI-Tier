@@ -24,6 +24,7 @@ export const config = {
     tierMap: tierMap,
     // API 端點
     LLMs: [
+        "dynamic/auto_backup",
         "google/gemini-2.5-flash",
         "google/gemini-2.0-flash",
         "google/gemini-2.0-flash-lite",

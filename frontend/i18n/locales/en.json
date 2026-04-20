@@ -1,4 +1,7 @@
 {
+    "alert": {
+        "geminiBackup": "⚠️ Due to high load on Gemini API, we've switched to dynamic/auto_backup mode.\n\nThis mode will automatically fall back to other available models to ensure service stability. Thank you for your patience!"
+    },
     "home": {
         "title": "Create a Tier List for Anything"
     },
