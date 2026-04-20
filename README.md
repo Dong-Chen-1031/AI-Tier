@@ -1,8 +1,10 @@
 # AI-Tier
 
-Ever wanted a brutally honest AI to tier literally anything and rank it on a tier list? That is exactly what AI-Tier does. Type in a subject — a person, food, concept, whatever — input a character for the AI to roleplay as (Trump, Steve Jobs, you name it), and watch it roast or praise your subject in real time. The verdict arrives with a matching image, an animated tier placement, and optionally read aloud in the voice of almost any public figure on the planet.
+Ever wanted a brutally honest AI to judge literally anything and rank it on a tier list? That is exactly what AI-Tier does. Type in a subject — a person, food, concept, whatever — pick a character for the AI to roleplay as (Trump, Steve Jobs, you name it), and watch it roast or praise your subject in real time. The verdict arrives with a matching image, an animated tier placement, and optionally read aloud in the voice of almost any public figure on the planet.
 
 Live demo: https://ai-tier.doong.me
+
+![screenshot](screenshot/image.png)
 
 ## Features
 
@@ -14,6 +16,10 @@ Live demo: https://ai-tier.doong.me
 - **Multiple LLM models** — Pick from several Google Gemini models routed through Cloudflare AI Gateway, in case you need a second opinion.
 - **Internationalization** — The UI is fully translated into English and Traditional Chinese, with automatic language detection via `i18next-browser-languagedetector`.
 - **Bot protection** — Cloudflare Turnstile keeps automated abuse away so the AI's opinions stay yours.
+
+## Demo
+
+<video controls src="screenshot/use.mov" title="Title"></video>
 
 ## Tech Stack
 
